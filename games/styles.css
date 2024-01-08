@@ -1,0 +1,89 @@
+body {
+    font-family: Arial, sans-serif;
+    line-height: 1.6;
+    margin-right: 7%;
+    margin-left: 7%;
+    background-color: #15171E;
+}
+
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    background-color: #15171E;
+    width: auto;
+    height: 50px;
+  }
+
+  .left-section, .right-section {
+    display: flex;
+    align-items: center;
+  }
+  .shop{
+    display: flex;
+    align-items: center;
+    margin-right: 20px;
+    font-size: 13px;
+    cursor: pointer;
+    padding: 5px;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+  }
+  .conta{
+    display: flex;
+    align-items: center;
+    font-size: 13px;
+    cursor: pointer;
+    padding: 5px;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+  }
+
+  div.icon {
+    margin-right: 5px;
+  }
+  img.icon{
+    height: 35px;
+    width: 35px;
+  }
+
+.shop:hover, .conta:hover {
+    background-color: #23252B; /* Cor mais clara ao passar o mouse */
+}
+
+.rectangles-container {
+    display: flex;
+}
+
+.categorias {
+    flex: 5;
+    height: 50px; /* Ajuste a altura conforme necessário */
+    background-color: #23252B; /* Cor de fundo dos retângulos */
+    margin-right: 5px; /* Espaçamento entre os retângulos */
+    display: flex;
+}
+
+.pesquisa {
+    flex: 3;
+    height: 50px; /* Ajuste a altura conforme necessário */
+    background-color: #23252B; /* Cor de fundo dos retângulos */
+    margin-right: 5px; /* Espaçamento entre os retângulos */
+}
+.filtro {
+    flex: 2;
+    height: 50px; /* Ajuste a altura conforme necessário */
+    background-color: #23252B; /* Cor de fundo dos retângulos */
+}
+.categoria-item{
+    flex: 1;
+    display: flex;
+    align-items: center;
+    transition: background-color 0.3s ease;
+    cursor: pointer;
+    justify-content: center;
+    color: #8d909b;
+}
+.categoria-item:hover {
+    background-color: #3a3b3f; /* Cor mais clara ao passar o mouse */
+}

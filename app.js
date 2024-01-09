@@ -15,13 +15,36 @@ const dbConfig = {
     database: 'gamedan'
 };
 
-app.get('/descricao', (req, res) => {
-    // Caminho completo até o arquivo index.html na pasta descricao
-    const indexPath = path.join(__dirname, './descricao/index.html');
-    
-    // Envia o arquivo index.html como resposta
-    res.sendFile(indexPath);
+
+app.get('/descricao', async (req, res) => {
+    try {
+        const gameId = req.query.id;
+
+        if (!gameId) {
+            return res.status(400).send('ID do jogo não fornecido');
+        }
+
+        console.log('Recebido pedido para o jogo com ID:', gameId);
+
+        const connection = await mysql.createConnection(dbConfig);
+        const [rows, fields] = await connection.execute('SELECT * FROM games WHERE id = ?', [gameId]);
+        await connection.end();
+
+        if (rows.length === 0) {
+            console.log('Jogo não encontrado no banco de dados');
+            return res.status(404).send('Jogo não encontrado');
+        }
+
+        console.log('Dados do jogo encontrado:', rows[0]);
+
+        // Renderiza a página descricao.html com os dados do jogo
+        res.sendFile(path.join(__dirname, '/descricao/index.html'));
+    } catch (error) {
+        console.error('Erro na consulta ao banco de dados:', error);
+        res.status(500).send('Erro interno no servidor');
+    }
 });
+
 
 app.get('/api/jogos', async (req, res) => {
     try {

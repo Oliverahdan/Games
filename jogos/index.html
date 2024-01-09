@@ -115,13 +115,10 @@ fetch('/api/jogos')
         const jogosSection = document.querySelector('.jogos');
 
         // Itera sobre os dados e adiciona à seção "jogos"
-        data.forEach(jogo => {
+                data.forEach(jogo => {
             const jogoElement = document.createElement('div');
             jogoElement.classList.add('jogo');
-
-            // Adiciona um link para "/descricao" com o ID do jogo como parâmetro
-            jogoElement.innerHTML = `<a href="/descricao?id=${jogo.id}"><img class="imgjogo" src="${jogo.image}" alt="fim"></a>`;
-            
+            jogoElement.innerHTML = `<a href="/descricao?id=${jogo.id}&timestamp=${Date.now()}"><img class="imgjogo" src="${jogo.image}" alt="fim">`;
             jogosSection.appendChild(jogoElement);
         });
     })

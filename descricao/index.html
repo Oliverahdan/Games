@@ -4,6 +4,22 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="styles.css">
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh; /* Isso garante que o corpo da página tenha no mínimo 100% da altura da viewport */
+            margin: 0;
+        }
+
+        .body {
+            flex: 1; /* Isso faz com que o conteúdo principal ocupe todo o espaço restante */
+        }
+
+        .footer {
+            margin-top: auto; /* Empurra o rodapé para o final da página */
+        }
+    </style>
     <title>Game</title>
 </head>
 <body>
@@ -35,14 +51,61 @@
     </header>
     
     <section>
-        
+        <div class="descricao-container">
+            <h1 id="nomeJogo" style="color: white;"></h1>
+            <div class="imgdesc" style="display: flex;">
+            <img id="imgJogo" class="imgjogo" alt="Imagem do Jogo" style="width: 200px;">
+            <button>comprar</button>
+            </div>
+            <p id="descricaoJogo" style="color: white;"></p>
+            <!-- Adicione mais informações do jogo conforme necessário -->
+        </div>
     </section>
-
 </div>
+
 <footer class="footer">
     <img src="https://i.postimg.cc/FzBrkz8f/circulo-c-1.png" alt="fim" style="width: 15px; height: 15px; margin-right: 5px;">
     <span>2024 Gamedan</span>
 </footer>
-       
+
+<script>
+    async function carregarInformacoesJogo() {
+        console.log('Função carregarInformacoesJogo chamada');
+    
+        const params = new URLSearchParams(window.location.search);
+        const gameId = params.get('id');
+        const noCache = params.get('nocache') || Date.now(); // Usando timestamp como noCache
+    
+        console.log('ID do jogo:', gameId);
+    
+        if (gameId) {
+            try {
+                const response = await fetch(`/api/jogos?id=${gameId}&nocache=${noCache}`);
+                const data = await response.json();
+    
+                const jogo = data.find(j => j.id == gameId); // Encontra o jogo com o ID correspondente
+    
+                if (jogo) {
+                    document.getElementById('nomeJogo').innerText = jogo.name;
+                    document.getElementById('imgJogo').src = jogo.image;
+                    document.getElementById('descricaoJogo').innerText = jogo.description;
+                    // Preencha outras informações do jogo conforme necessário
+                } else {
+                    console.error('Jogo não encontrado');
+                }
+            } catch (error) {
+                console.error('Erro ao carregar informações do jogo:', error);
+            }
+        } else {
+            console.error('ID do jogo não fornecido');
+        }
+    }
+    
+    // Chame a função ao carregar a página e ao detectar mudanças de estado
+    document.addEventListener('DOMContentLoaded', carregarInformacoesJogo);
+    window.addEventListener('popstate', carregarInformacoesJogo);
+</script>
+
+    
 </body>
 </html>

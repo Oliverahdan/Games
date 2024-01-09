@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="styles.css">
+    <title>Game</title>
+</head>
+<body>
+<div class="body">
+    <header>
+        <div class="left-section">
+          <div class="icon">
+            <img class="icon" src="https://i.postimg.cc/XYLYdrBP/do-utilizador.png" alt="conta">
+
+          </div>
+          <h1 style="color: white;">Gamedan</h1>
+        </div>
+        <div class="right-section">
+            <div class="shop" style="height: 40px;">
+                <div class="icon">
+                    <img class="icon" src="https://i.postimg.cc/QCLr7D8C/vista-lateral-vazia-do-carrinho-de-compras-2.png" alt="shop">
+                </div>
+                <h1 style="color: white;"> Shop</h1>
+            </div>
+            
+            <div class="conta" style="height: 40px;">
+                <div class="icon">
+                    <img class="icon" src="https://i.postimg.cc/XYLYdrBP/do-utilizador.png" alt="conta">
+                </div>
+                <h1 style="color: white;"> Conta</h1>
+            </div>
+
+        </div>
+      </header>
+
+      <section class="rectangles-container">
+        <div class="categorias">
+            <div class="categoria-item">
+                <h2 style="margin-right: 10px;">Ação</h2>
+            </div>
+            <div class="categoria-item">
+                <h2 style="margin-right: 10px;">Corrida</h2>
+            </div>
+            <div class="categoria-item">
+                <h2 style="margin-right: 10px;">Luta</h2>
+            </div>
+        </div>
+        
+
+        <div class="pesquisa">
+            <input type="text" placeholder="Pesquise o Jogo" style="width: 100%; height: 100%; background-color: #121315;">
+        </div>
+    </section>
+
+    <section class="slideshow-container">
+        <div class="slides">
+            <div class="slide"><img src="https://i.postimg.cc/vTbtVSrx/spider.png" alt="Imagem 1" style="width: 100%; height: 100%;"></div>
+            <div class="slide"><img src="https://i.postimg.cc/HLthP56M/tlou2.jpg" alt="Imagem 2"  style="width: 100%; height: 100%;"></div>
+            <div class="slide"><img src="https://i.postimg.cc/PqFxg6rs/Forza-Horizon-3-capa.png" alt="Imagem 3" style="width: 100%; height: 100%;"></div>
+            <div class="slide"><img src="https://i.postimg.cc/9QXVpGP6/mortal-kombat.jpg" alt="Imagem 4" style="width: 100%; height: 100%;"></div>
+        </div>
+
+        <button class="prev" onclick="plusSlides(-1)">❮</button>
+        <button class="next" onclick="plusSlides(1)">❯</button>
+    </section>
+    <br>
+    <p style="color: white; font-size: 30px;">Lista de jogos</p>
+    <br>
+    <section class="jogos">
+
+   </section>
+
+</div>
+
+
+<footer class="footer">
+    <img src="https://i.postimg.cc/FzBrkz8f/circulo-c-1.png" alt="fim" style="width: 15px; height: 15px; margin-right: 5px;">
+    <span>2024 Gamedan</span>
+</footer>
+
+    <script>
+        let slideIndex = 1;
+        showSlides(slideIndex);
+
+        function plusSlides(n) {
+            showSlides(slideIndex += n);
+        }
+
+        function currentSlide(n) {
+            showSlides(slideIndex = n);
+        }
+
+        function showSlides(n) {
+            let i;
+            const slides = document.querySelector('.slides');
+
+            if (n > slides.children.length) {
+                slideIndex = 1;
+            }
+
+            if (n < 1) {
+                slideIndex = slides.children.length;
+            }
+
+            slides.style.transform = `translateX(${-100 * (slideIndex - 1)}%)`;
+        }
+
+
+// Adicione este código no seu script no HTML
+
+fetch('/api/jogos')
+    .then(response => response.json())
+    .then(data => {
+        const jogosSection = document.querySelector('.jogos');
+
+        // Itera sobre os dados e adiciona à seção "jogos"
+        data.forEach(jogo => {
+            const jogoElement = document.createElement('div');
+            jogoElement.classList.add('jogo');
+
+            // Adiciona um link para "/descricao" com o ID do jogo como parâmetro
+            jogoElement.innerHTML = `<a href="/descricao?id=${jogo.id}"><img class="imgjogo" src="${jogo.image}" alt="fim"></a>`;
+            
+            jogosSection.appendChild(jogoElement);
+        });
+    })
+    .catch(error => console.error('Erro ao buscar dados do servidor:', error));
+    </script>
+</body>
+</html>

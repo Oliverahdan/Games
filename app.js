@@ -122,7 +122,7 @@ app.get('/jogos', async (req, res) => {
 });
 
 app.get('/', async (req, res) => {
-    res.sendFile(path.join(__dirname, '/cadastro/index.html'));
+    res.sendFile(path.join(__dirname, '/jogos/index.html'));
 });
 
 app.listen(port, () => {

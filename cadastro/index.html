@@ -11,7 +11,7 @@
 </head>
 <body class="flex items-center justify-center h-screen bg-gray-100">
     <div class="text-center">
-        <h1 class="text-3xl font-bold mb-4">Bem vindo ao amigo Secreto</h1>
+        <h1 class="text-3xl font-bold mb-4">Bem vindo ao Gamedan</h1>
         <h2 class="text-xl mb-4">Inscreva-se para criar uma sessão</h2>
         <form id="cadastroForm" action="/api/userhost" method="post" class="mb-4">
             <div class="mb-4">
@@ -34,7 +34,7 @@
     </div>
 
     <script>
-        function cadastrarUsuario() {
+       function cadastrarUsuario() {
             const form = document.getElementById('cadastroForm');
             const formData = new FormData(form);
 
@@ -50,13 +50,15 @@
                 });
         }
 
-        // Função para exibir a mensagem de cadastrado
-        function exibirMensagemCadastro() {
-            const mensagemCadastro = document.getElementById('mensagemCadastro');
-            mensagemCadastro.style.display = 'block';
-            // Redirecionar para /login após a conexão bem-sucedida
-            window.location.href = '/login';
-        }
+     // Função para exibir a mensagem de cadastrado
+function exibirMensagemCadastro() {
+    const mensagemCadastro = document.getElementById('mensagemCadastro');
+    mensagemCadastro.style.display = 'block';
+    alert("Cadastrado com sucesso!"); // Adicione este alert
+    // Redirecionar para /login/index.html após a conexão bem-sucedida
+    window.location.href = '/login/index.html';
+}
+
     </script>
 </body>
 </html>

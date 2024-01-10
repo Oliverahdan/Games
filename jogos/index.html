@@ -3,8 +3,268 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" type="text/css" href="/jogos/jogos.css">
     <title>Game</title>
+    <style>
+        .body {
+  font-family: Arial, sans-serif;
+  margin-right: 7%;
+  margin-left: 7%;
+
+}
+body {
+margin: 0;
+padding: 0;
+min-height: 100vh; /* Garante que o conteúdo ocupe pelo menos 100% da altura da visualização */
+display: flex;
+flex-direction: column;
+background-color: #1B2838;
+}
+
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+  background-color: #1B2838;
+  width: auto;
+  height: 50px;
+}
+
+.left-section, .right-section {
+  display: flex;
+  align-items: center;
+}
+.shop{
+  display: flex;
+  align-items: center;
+  margin-right: 20px;
+  font-size: 13px;
+  cursor: pointer;
+  padding: 5px;
+  border-radius: 5px;
+  transition: background-color 0.3s ease;
+}
+.conta{
+  display: flex;
+  align-items: center;
+  font-size: 13px;
+  cursor: pointer;
+  padding: 5px;
+  border-radius: 5px;
+  transition: background-color 0.3s ease;
+}
+
+div.icon {
+  margin-right: 5px;
+}
+img.icon{
+  height: 35px;
+  width: 35px;
+}
+
+.shop:hover, .conta:hover {
+  background-color: #8d909b98; /* Cor mais clara ao passar o mouse */
+}
+
+.rectangles-container {
+  display: flex;
+}
+
+.categorias {
+  flex: 5;
+  height: 50px; /* Ajuste a altura conforme necessário */
+  background-color: #121315; /* Cor de fundo dos retângulos */
+  margin-right: 1px; /* Espaçamento entre os retângulos */
+  display: flex;
+}
+
+.pesquisa {
+  flex: 3;
+  height: 45px; /* Ajuste a altura conforme necessário */
+  background-color: #121315; /* Cor de fundo dos retângulos */
+  
+}
+.categoria-item{
+  flex: 1;
+  display: flex;
+  align-items: center;
+  transition: background-color 0.3s ease;
+  cursor: pointer;
+  justify-content: center;
+  color: #8d909b;
+}
+.categoria-item:hover {
+  background-color: #3a3b3f; /* Cor mais clara ao passar o mouse */
+}
+
+
+.slideshow-container {
+max-width: 100%;
+position: relative;
+margin-top: 5px;
+overflow: hidden;
+}
+
+.slides {
+display: flex;
+transition: transform 0.5s ease-in-out;
+height: 400px;
+}
+
+.slide {
+min-width: 100%;
+box-sizing: border-box;
+}
+
+.prev, .next {
+cursor: pointer;
+position: absolute;
+top: 50%;
+width: auto;
+padding: 16px;
+margin-top: -22px;
+color: white;
+font-size: 20px;
+border: none;
+background: rgba(0, 0, 0, 0.5);
+}
+
+.next {
+right: 0;
+}
+
+footer {
+background-color: #1B2838;
+color: white;
+padding: 20px;
+text-align: center;
+border-top: 1px solid white; /* Linha branca separando do conteúdo principal */
+display: flex;
+justify-content: center;
+align-items: center;
+}
+.footer {
+background-color: #1B2838;
+          color: white;
+          padding: 20px;
+          text-align: center;
+          border-top: 1px solid white; /* Linha branca separando do conteúdo principal */
+          margin-top: 40px; /* Faz o footer ficar no final da página */
+      }
+
+       /* Adicione este bloco de estilos no head para criar um grid */
+.jogos {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr 1fr;
+        gap: 20px;
+        justify-content: center;
+        align-items: stretch;
+        margin-top: 20px;
+    }
+
+    /* Adicione estilos adicionais conforme necessário */
+
+    .imgjogo{
+      width: 100%;
+  height: 300px; /* Isso garante que a altura seja ajustada automaticamente, mantendo a proporção da imagem */
+  display: block;
+    }
+
+
+
+/*responsividade*/
+@media screen and (max-width: 500px) {
+.body {
+  margin-right: 2%;
+  margin-left: 2%;
+
+}
+.slides {
+height: 100px;
+}
+
+.categorias {
+font-size: 10px;
+}
+
+.rectangles-container {
+display: block;
+}
+
+.left-section, .right-section {
+font-size: 10px;
+}
+.shop{
+font-size: 10px;
+}
+.conta{
+font-size: 10px;
+}
+h1{
+display: none;
+}
+div.icon {
+margin-right: 5px;
+}
+img.icon{
+height: 30px;
+width: 30px;
+}
+.jogos{
+grid-template-columns: 1fr 1fr;
+}
+
+.imgjogo{
+height: 100px; /* Isso garante que a altura seja ajustada automaticamente, mantendo a proporção da imagem */
+
+}
+
+}
+@media screen and (min-width: 2560px) {
+  .box1 {
+      grid-column-start: 1;
+      grid-column-end: 2;
+      grid-row-start: 1;
+      grid-row-end: 5;
+    }
+    .box2 {
+      grid-column-start: 1;
+      grid-row-start: 5;
+      grid-row-end: 9;
+    }
+    .box3 {
+      grid-column-start: 2;
+      grid-column-end: 4;
+      grid-row-start: 1;
+      grid-row-end: 9;
+    }
+}
+
+#gameList {
+    width: 100%;
+    max-height: 120px;
+    overflow-y: auto;
+    list-style-type: none;
+    padding: 5px;
+    background-color: #fff;
+    border: 1px solid #ccc;
+    margin-top: -3px; /* Adiciona margem superior para separar do campo de pesquisa */
+    position: absolute;
+    z-index: 1; /* Coloca a lista sobre o campo de pesquisa */
+    box-sizing: border-box;
+}
+
+#gameList li {
+    padding: 8px;
+    border-bottom: 1px solid #ccc;
+}
+
+#gameList li:last-child {
+    border-bottom: none;
+}
+
+    </style>
 </head>
 <body>
 <div class="body">
@@ -17,7 +277,7 @@
           <h2 class="nome" style="color: white;">Gamedan</h2>
         </div>
         <div class="right-section">
-            <div class="shop" style="height: 40px;">
+            <div class="shop" style="height: 40px;" onclick="shop()">
                 <div class="icon">
                     <img class="icon" src="https://i.postimg.cc/QCLr7D8C/vista-lateral-vazia-do-carrinho-de-compras-2.png" alt="shop">
                 </div>
@@ -48,12 +308,13 @@
         </div>
         
 
-        <div class="pesquisa">
-            <input type="text" placeholder="Pesquise o Jogo" style="width: 100%; height: 100%; background-color: #121315;">
+        <div class="pesquisa" style="position: relative; z-index: 2;">
+            <input type="search" id="searchInput" placeholder="Pesquise o Jogo" style="width: 100%; height: 100%; color: white; background-color: #121315;" oninput="updateGameList(this.value)">
+            <ul id="gameList" style="width: 100%; display: none;"></ul>
         </div>
     </section>
 
-    <section class="slideshow-container">
+    <section class="slideshow-container" style="position: relative; z-index: 1;">
         <div class="slides">
             <div class="slide"><img src="https://i.postimg.cc/vTbtVSrx/spider.png" alt="Imagem 1" style="width: 100%; height: 100%;"></div>
             <div class="slide"><img src="https://i.postimg.cc/HLthP56M/tlou2.jpg" alt="Imagem 2"  style="width: 100%; height: 100%;"></div>
@@ -78,7 +339,7 @@
     <img src="https://i.postimg.cc/FzBrkz8f/circulo-c-1.png" alt="fim" style="width: 15px; height: 15px; margin-right: 5px;">
     <span>2024 Gamedan</span>
 </footer>
-
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
     <script>
         let slideIndex = 1;
         showSlides(slideIndex);
@@ -105,6 +366,10 @@
 
             slides.style.transform = `translateX(${-100 * (slideIndex - 1)}%)`;
         }
+        function shop(){
+            window.location.href = './shop';
+        }
+        
 
 
 // Adicione este código no seu script no HTML
@@ -123,6 +388,65 @@ fetch('/api/jogos')
         });
     })
     .catch(error => console.error('Erro ao buscar dados do servidor:', error));
+
+    $(document).ready(function() {
+    // Monitorar alterações no campo de pesquisa
+    $('#searchInput').on('input', function() {
+        const searchTerm = $(this).val().toLowerCase();
+
+        // Fazer uma solicitação AJAX para obter a lista de jogos
+        $.get('/api/jogos', { name: searchTerm }, function(data) {
+            const jogosSection = document.querySelector('.jogos');
+            jogosSection.innerHTML = ''; // Limpar a seção de jogos
+
+            // Iterar sobre os dados e adicionar à seção "jogos"
+            data.forEach(jogo => {
+                const jogoElement = document.createElement('div');
+                jogoElement.classList.add('jogo');
+                jogoElement.innerHTML = `<a href="/descricao?id=${jogo.id}&timestamp=${Date.now()}"><img class="imgjogo" src="${jogo.image}" alt="fim">`;
+                jogosSection.appendChild(jogoElement);
+            });
+        });
+    });
+
+    // Manipular o clique em um jogo na lista suspensa
+    $('#gameList').on('change', function () {
+        const selectedGame = $(this).val();
+        // Atualizar a lista de jogos com o jogo selecionado
+        updateGameList(selectedGame);
+    });
+});
+
+// Adicione esta função para lidar com o caso em que a pesquisa é apagada
+$('#searchInput').on('search', function() {
+    const searchTerm = $(this).val();
+    if (!searchTerm) {
+        // Se a pesquisa for apagada, obter a lista completa de jogos
+        updateGameList(); // Chamar a função sem argumentos busca todos os jogos
+    }
+});
+
+
+function updateGameList(selectedGame) {
+    // Fazer uma solicitação AJAX para obter apenas o jogo correspondente
+    fetch(`/api/jogos?name=${selectedGame}`)
+        .then(response => response.json())
+        .then(data => {
+            const jogosSection = document.querySelector('.jogos');
+            jogosSection.innerHTML = ''; // Limpar a seção de jogos
+
+            // Adicionar apenas o jogo correspondente à seção "jogos"
+            const jogo = data[0];
+            if (jogo) {
+                const jogoElement = document.createElement('div');
+                jogoElement.classList.add('jogo');
+                jogoElement.innerHTML = `<a href="/descricao?id=${jogo.id}&timestamp=${Date.now()}"><img class="imgjogo" src="${jogo.image}" alt="fim">`;
+                jogosSection.appendChild(jogoElement);
+            }
+        })
+        .catch(error => console.error('Erro ao buscar dados do servidor:', error));
+}
+
     </script>
 </body>
 </html>

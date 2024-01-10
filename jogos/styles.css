@@ -162,3 +162,73 @@ footer {
     height: 300px; /* Isso garante que a altura seja ajustada automaticamente, mantendo a proporção da imagem */
     display: block;
       }
+
+  
+
+/*responsividade*/
+@media screen and (max-width: 500px) {
+  .body {
+    margin-right: 2%;
+    margin-left: 2%;
+
+}
+.slides {
+  height: 100px;
+}
+
+.categorias {
+  font-size: 10px;
+}
+
+.rectangles-container {
+  display: block;
+}
+
+.left-section, .right-section {
+  font-size: 10px;
+}
+.shop{
+  font-size: 10px;
+}
+.conta{
+  font-size: 10px;
+}
+h1{
+  display: none;
+}
+div.icon {
+  margin-right: 5px;
+}
+img.icon{
+  height: 30px;
+  width: 30px;
+}
+.jogos{
+  grid-template-columns: 1fr 1fr;
+}
+
+.imgjogo{
+height: 100px; /* Isso garante que a altura seja ajustada automaticamente, mantendo a proporção da imagem */
+
+}
+
+  }
+  @media screen and (min-width: 2560px) {
+    .box1 {
+        grid-column-start: 1;
+        grid-column-end: 2;
+        grid-row-start: 1;
+        grid-row-end: 5;
+      }
+      .box2 {
+        grid-column-start: 1;
+        grid-row-start: 5;
+        grid-row-end: 9;
+      }
+      .box3 {
+        grid-column-start: 2;
+        grid-column-end: 4;
+        grid-row-start: 1;
+        grid-row-end: 9;
+      }
+  }

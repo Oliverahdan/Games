@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bem vindo ao amigo Secreto</title>
+    <!-- Inclui a biblioteca Tailwind CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100 min-h-screen flex items-center justify-center">
+    <div class="text-center">
+        <h1 class="text-3xl font-bold mb-4">Bem vindo ao amigo Secreto</h1>
+        <form action="/grupo" class="max-w-md mx-auto bg-white p-6 rounded-md shadow-md">
+            <label for="email" class="block text-sm font-medium text-gray-700">Email:</label>
+            <input type="email" name="email" class="mt-1 p-2 border border-gray-300 rounded-md w-full" required>
+            <label for="senha" class="block text-sm font-medium text-gray-700 mt-2">Senha:</label>
+            <input type="password" name="senha" class="mt-1 p-2 border border-gray-300 rounded-md w-full" required>
+            <button type="submit" class="mt-4 bg-blue-500 text-white px-4 py-2 rounded">Entrar</button>
+        </form>
+    </div>
+
+    <script>
+        function realizarLogin() {
+            // Lógica para autenticar o usuário, obter o userhost_id e armazenar
+            const userhost_id = obterUserHostId(); // Substitua com sua lógica de obtenção do ID
+            localStorage.setItem('userhost_id', userhost_id);
+            window.location.href = '/grupo'; // Redireciona para a página do grupo após o login
+        }
+    </script>
+</body>
+</html>

@@ -96,6 +96,23 @@ app.post('/login', (req, res) => {
     }
 });
 
+// Rota para salvar usuário host
+app.post('/api/userhost', async (req, res) => {
+    const { nome, email, senha } = req.body;
+
+    try {
+        const connection = await createConnection();
+
+        // Inserir os dados do usuário na tabela 'userhost' com senha em texto simples
+        const [results] = await connection.execute('INSERT INTO users (name, email, password) VALUES (?, ?, ?)', [nome, email, senha]);
+
+        // Redirecionar para '/grupo' após inserção bem-sucedida
+        res.redirect('/login');
+    } catch (err) {
+        console.error('Erro no servidor:', err);
+        res.status(500).json({ message: 'Erro no servidor' });
+    }
+});
 
 app.get('/api/jogos', async (req, res) => {
     try {
@@ -107,6 +124,10 @@ app.get('/api/jogos', async (req, res) => {
         console.error('Erro ao buscar dados do banco de dados:', error);
         res.status(500).send('Erro interno do servidor');
     }
+});
+
+app.get('/cadastro', async (req, res) => {
+    res.sendFile(path.join(__dirname, '/cadastro/index.html'));
 });
 
 app.get('/login', async (req, res) => {

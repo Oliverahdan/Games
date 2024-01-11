@@ -75,6 +75,7 @@ div.icon {
 img.icon{
   height: 35px;
   width: 35px;
+  border-radius: 50px;
 }
 
 .shop:hover, .conta:hover {
@@ -160,6 +161,25 @@ margin-top: 40px; /* Faz o footer ficar no final da página */
     margin-top: 20px;
 }
 }
+
+.login {
+  display: none;
+  color: white;
+  flex-direction: column; /* Adicionado para posicionar os elementos em coluna */
+  align-items: center;
+  position: fixed;
+  height: 50px;
+  width: 100px;
+  padding-left: 20px;
+  margin-top: 50px;
+  background-color: #8d909b98;
+}
+
+.contabotao {
+    display: grid;
+    grid-area: 1fr;
+  }
+
     </style>
     <title>Game</title>
 </head>
@@ -168,7 +188,7 @@ margin-top: 40px; /* Faz o footer ficar no final da página */
     <header>
         <div class="left-section">
           <div class="icon">
-            <img class="icon" src="https://i.postimg.cc/XYLYdrBP/do-utilizador.png" alt="conta">
+            <img class="icon" src="https://i.postimg.cc/W3C9Z5bC/logo.jpg" alt="conta">
 
           </div>
           <h1 style="color: white; font-size: 24px; cursor: pointer;" onclick="voltar()">Gamedan</h1>
@@ -181,11 +201,17 @@ margin-top: 40px; /* Faz o footer ficar no final da página */
                 <h1 style="color: white;"> Shop</h1>
             </div>
             
-            <div class="conta" style="height: 40px;">
-                <div class="icon">
-                    <img class="icon" src="https://i.postimg.cc/XYLYdrBP/do-utilizador.png" alt="conta">
+            <div class="contabotao">
+                <div class="conta" style="height: 40px;" onclick="toggleLogin()">
+                    <div class="icon">
+                        <img class="icon" src="https://i.postimg.cc/XYLYdrBP/do-utilizador.png" alt="conta">
+                    </div>
+                    <h1 style="color: white;"> Conta</h1>
                 </div>
-                <h1 style="color: white;"> Conta</h1>
+        
+                    <div class="login" id="login" style="cursor: pointer; font-size: 12px; margin-left: 30px;">
+                        <h1>Login</h1>
+                    </div>
             </div>
 
         </div>
@@ -231,6 +257,10 @@ margin-top: 40px; /* Faz o footer ficar no final da página */
 
 <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
 <script>
+        function toggleLogin() {
+    $('#login').toggle();
+}
+
     function shop(){
         window.location.href = './shop';
     }
@@ -279,11 +309,18 @@ $(document).ready(function() {
             // Obtém o índice da estrela clicada
             const index = $(this).index();
 
+            // Define as URLs das imagens
+            const normalImage = 'https://i.postimg.cc/TYhQhV9g/estrela-2.png';
+            const selectedImage = 'https://i.postimg.cc/nLnLCTwR/estrela-1.png';
+
             // Percorre as estrelas e muda a imagem
             $('.imgestrela').each(function(i) {
                 if (i <= index) {
-                    // Índice da estrela menor ou igual à estrela clicada, então muda a imagem
-                    $(this).attr('src', 'https://i.postimg.cc/nLnLCTwR/estrela-1.png'); // Substitua 'nova-imagem.png' pela imagem desejada
+                    // Índice da estrela menor ou igual à estrela clicada
+                    $(this).attr('src', selectedImage);
+                } else {
+                    // Índice da estrela maior que a estrela clicada
+                    $(this).attr('src', normalImage);
                 }
             });
         });

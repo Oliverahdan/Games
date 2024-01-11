@@ -61,6 +61,7 @@ div.icon {
 img.icon{
   height: 35px;
   width: 35px;
+  border-radius: 50px ;
 }
 
 .shop:hover, .conta:hover {
@@ -264,6 +265,12 @@ height: 100px; /* Isso garante que a altura seja ajustada automaticamente, mante
     border-bottom: none;
 }
 
+.login {
+            display: none;
+            margin-top: 10px;
+            color: white;
+        }
+
     </style>
 </head>
 <body>
@@ -271,7 +278,7 @@ height: 100px; /* Isso garante que a altura seja ajustada automaticamente, mante
     <header>
         <div class="left-section">
           <div class="icon">
-            <img class="icon" src="https://i.postimg.cc/XYLYdrBP/do-utilizador.png" alt="conta">
+            <img class="icon" src="https://i.postimg.cc/W3C9Z5bC/logo.jpg" alt="conta">
 
           </div>
           <h2 class="nome" style="color: white;">Gamedan</h2>
@@ -284,13 +291,13 @@ height: 100px; /* Isso garante que a altura seja ajustada automaticamente, mante
                 <h1 style="color: white;"> Shop</h1>
             </div>
             
-            <div class="conta" style="height: 40px;">
+            <div class="conta" style="height: 40px;" onclick="toggleLogin()">
                 <div class="icon">
                     <img class="icon" src="https://i.postimg.cc/XYLYdrBP/do-utilizador.png" alt="conta">
                 </div>
                 <h1 style="color: white;"> Conta</h1>
             </div>
-
+           
         </div>
       </header>
 
@@ -370,8 +377,6 @@ height: 100px; /* Isso garante que a altura seja ajustada automaticamente, mante
             window.location.href = './shop';
         }
         
-
-
 // Adicione este código no seu script no HTML
 
 fetch('/api/jogos')

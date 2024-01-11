@@ -83,18 +83,20 @@ img.icon{
 
 .imgdesc{
     display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
     align-items: end;
 }
 .estrelas{
     display: flex;
-    align-items: end;
+    margin-bottom: 10px;
+    margin-left: -100px;
 }
 
 .imgestrela{
     width: 50px;
     height: 50px;
-    margin-right: 5px;
+    margin-left: 5;
+    cursor: pointer;
 }
 footer {
 background-color: #1B2838;
@@ -136,6 +138,28 @@ margin-top: 40px; /* Faz o footer ficar no final da página */
             padding: 8px 12px;
             cursor: pointer;
         }
+#price{
+    font-size: 50px;
+    margin-left: -60px;
+    color: white;
+}
+
+@media screen and (max-width: 2000px) {
+    .imgdesc {
+        grid-template-columns: 1fr;
+    }
+    .estrelas{
+    margin-left: 1px;
+    margin-top: 20px;
+}
+#price{
+    margin-left: 1px;
+    margin-top: 20px;
+}
+.b{
+    margin-top: 20px;
+}
+}
     </style>
     <title>Game</title>
 </head>
@@ -172,22 +196,23 @@ margin-top: 40px; /* Faz o footer ficar no final da página */
             <h1 id="nomeJogo" style="color: white;"></h1>
                 <div class="imgdesc" >
                     <img id="imgJogo" class="imgjogo" alt="Imagem do Jogo" style="width: 300px; height: 350px;">
-                      <div class="estrelas">
-                        <img class="imgestrela" src="https://i.postimg.cc/tgD4PPKX/estrela.png" alt="">
-                        <img class="imgestrela" src="https://i.postimg.cc/tgD4PPKX/estrela.png" alt="">
-                        <img class="imgestrela" src="https://i.postimg.cc/tgD4PPKX/estrela.png" alt="">
-                        <img class="imgestrela" src="https://i.postimg.cc/tgD4PPKX/estrela.png" alt="">
-                        <img class="imgestrela" src="https://i.postimg.cc/tgD4PPKX/estrela.png" alt="">
-                      </div>
-                    <button style="width: 200px; height: 80px; border-radius: 20px; font-size:large; cursor: pointer;">comprar</button>
+                    <strong id="price"></strong>
+                    <div class="estrelas">
+                        <img class="imgestrela"  src="https://i.postimg.cc/TYhQhV9g/estrela-2.png" alt="">
+                        <img class="imgestrela"  src="https://i.postimg.cc/TYhQhV9g/estrela-2.png" alt="">
+                        <img class="imgestrela" src="https://i.postimg.cc/TYhQhV9g/estrela-2.png" alt="">
+                        <img class="imgestrela"  src="https://i.postimg.cc/TYhQhV9g/estrela-2.png" alt="">
+                        <img class="imgestrela"  src="https://i.postimg.cc/TYhQhV9g/estrela-2.png" alt="">
+                    </div>
+                    <button class="b" style="width: 200px; height: 80px; border-radius: 20px; font-size:large; cursor: pointer;">comprar</button>
                 </div>
-            <p id="descricaoJogo" style="color: white;"></p>
+            <p id="descricaoJogo" style="color: white; margin-top: 50px;"></p>
             <!-- Adicione mais informações do jogo conforme necessário -->
         </div>
     </section>
 
-  <section class="comentario">
-    <h2>Comentários</h2>
+  <section class="comentario" style="margin-top: 300px;">
+    <h2 style="color: white;">Comentários</h2>
 
     <form id="commentForm">
         <input type="text" id="commentInput" name="comment" placeholder="Digite seu comentário..." required>
@@ -204,6 +229,7 @@ margin-top: 40px; /* Faz o footer ficar no final da página */
     <span>2024 Gamedan</span>
 </footer>
 
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
 <script>
     function shop(){
         window.location.href = './shop';
@@ -211,37 +237,57 @@ margin-top: 40px; /* Faz o footer ficar no final da página */
     function voltar(){
             window.location.href = './jogos';
         }
-    async function carregarInformacoesJogo() {
-        console.log('Função carregarInformacoesJogo chamada');
-    
-        const params = new URLSearchParams(window.location.search);
-        const gameId = params.get('id');
-        const noCache = params.get('nocache') || Date.now(); // Usando timestamp como noCache
-    
-        console.log('ID do jogo:', gameId);
-    
-        if (gameId) {
-            try {
-                const response = await fetch(`/api/jogos?id=${gameId}&nocache=${noCache}`);
-                const data = await response.json();
-    
-                const jogo = data.find(j => j.id == gameId); // Encontra o jogo com o ID correspondente
-    
-                if (jogo) {
-                    document.getElementById('nomeJogo').innerText = jogo.name;
-                    document.getElementById('imgJogo').src = jogo.image;
-                    document.getElementById('descricaoJogo').innerText = jogo.description;
-                    // Preencha outras informações do jogo conforme necessário
-                } else {
-                    console.error('Jogo não encontrado');
-                }
-            } catch (error) {
-                console.error('Erro ao carregar informações do jogo:', error);
+        async function carregarInformacoesJogo() {
+    console.log('Função carregarInformacoesJogo chamada');
+
+    const params = new URLSearchParams(window.location.search);
+    const gameId = params.get('id');
+    const noCache = params.get('nocache') || Date.now(); // Usando timestamp como noCache
+
+    console.log('ID do jogo:', gameId);
+
+    if (gameId) {
+        try {
+            const response = await fetch(`/api/jogos?id=${gameId}&nocache=${noCache}`);
+            const data = await response.json();
+
+            const jogo = data.find(j => j.id == gameId); // Encontra o jogo com o ID correspondente
+
+            if (jogo) {
+                document.getElementById('nomeJogo').innerText = jogo.name;
+                document.getElementById('imgJogo').src = jogo.image;
+                document.getElementById('descricaoJogo').innerText = jogo.description;
+
+                // Formatando o preço com "R$" na frente e substituindo "." por ","
+                const formattedPrice = `R$ ${jogo.price.replace('.', ',')}`;
+                document.getElementById('price').innerText = formattedPrice;
+
+                // Preencha outras informações do jogo conforme necessário
+            } else {
+                console.error('Jogo não encontrado');
             }
-        } else {
-            console.error('ID do jogo não fornecido');
+        } catch (error) {
+            console.error('Erro ao carregar informações do jogo:', error);
         }
+    } else {
+        console.error('ID do jogo não fornecido');
     }
+}
+
+$(document).ready(function() {
+        $('.imgestrela').click(function() {
+            // Obtém o índice da estrela clicada
+            const index = $(this).index();
+
+            // Percorre as estrelas e muda a imagem
+            $('.imgestrela').each(function(i) {
+                if (i <= index) {
+                    // Índice da estrela menor ou igual à estrela clicada, então muda a imagem
+                    $(this).attr('src', 'https://i.postimg.cc/nLnLCTwR/estrela-1.png'); // Substitua 'nova-imagem.png' pela imagem desejada
+                }
+            });
+        });
+    });
     
     // Chame a função ao carregar a página e ao detectar mudanças de estado
     document.addEventListener('DOMContentLoaded', carregarInformacoesJogo);

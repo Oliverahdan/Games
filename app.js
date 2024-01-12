@@ -2,12 +2,11 @@ const express = require('express');
 const path = require('path');
 const mysql = require('mysql2/promise');
 const bodyParser = require('body-parser');
+const cookieParser = require('cookie-parser');
 
-// Cria uma instância do Express
 const app = express();
 const port = 3000;
 
-// Configurações para se conectar ao banco de dados MySQL
 const dbConfig = {
     host: 'localhost',
     user: 'root',
@@ -22,6 +21,13 @@ async function createConnection() {
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
+
+// Middleware para garantir a criação de uma nova conexão antes de cada rota
+app.use(async (req, res, next) => {
+    req.connection = await createConnection();
+    next();
+});
 
 app.get('/descricao', async (req, res) => {
     try {
@@ -53,24 +59,14 @@ app.post('/login', async (req, res) => {
     const { email, senha } = req.body;
 
     try {
-        const connection = await createConnection();
+        const [results] = await req.connection.execute('SELECT * FROM users WHERE email = ? AND password = ?', [email, senha]);
 
-        // Retrieve user data from the 'users' table
-        const [results] = await connection.execute('SELECT * FROM users WHERE email = ? AND password = ?', [email, senha]);
-
-        // Verificar se encontrou algum usuário
         if (results.length === 0) {
             res.status(401).json({ message: 'Credenciais inválidas' });
         } else {
-            // Definir um cookie após o login bem-sucedido
             res.cookie('userId', results[0].id);
-
-            // Redirecione o usuário para a página de jogos
             res.redirect('/jogos');
         }
-
-        // Fechar a conexão
-        await connection.end();
     } catch (error) {
         console.error('Erro no servidor:', error);
         res.status(500).json({ message: 'Erro no servidor' });

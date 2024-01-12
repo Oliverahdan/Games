@@ -62,7 +62,7 @@ app.post('/login', async (req, res) => {
     const { email, senha } = req.body;
 
     try {
-        const [results] = await req.connection.execute('SELECT * FROM users WHERE email = ? AND password = ?', [email, senha]);
+        const [results] = await req.locals.connection.execute('SELECT * FROM users WHERE email = ? AND password = ?', [email, senha]);
 
         if (results.length === 0) {
             res.status(401).json({ message: 'Credenciais inválidas' });
@@ -76,6 +76,7 @@ app.post('/login', async (req, res) => {
     }
 });
 
+// Rota para comprar
 app.post('/comprar', async (req, res) => {
     const gameId = req.body.gameId;
     const userId = req.body.userId;
@@ -87,7 +88,7 @@ app.post('/comprar', async (req, res) => {
     }
 
     try {
-        const [results] = await req.connection.execute('INSERT INTO shop (game, user) VALUES (?, ?)', [gameId, userId]);
+        const [results] = await req.locals.connection.execute('INSERT INTO shop (game, user) VALUES (?, ?)', [gameId, userId]);
         res.json({ message: 'Compra realizada com sucesso' });
     } catch (error) {
         console.error('Erro ao realizar a compra:', error);
@@ -112,6 +113,28 @@ app.get('/api/user/:id', async (req, res) => {
     } catch (error) {
         console.error('Erro no servidor:', error);
         res.status(500).json({ message: 'Erro no servidor' });
+    }
+});
+
+app.get('/compras', async (req, res) => {
+    try {
+        const userId = req.cookies.userId;
+
+        if (!userId) {
+            return res.status(401).json({ message: 'Usuário não autenticado' });
+        }
+
+        const [results] = await req.locals.connection.execute(`
+            SELECT shop.game, shop.user, games.image, games.name, games.price
+            FROM shop
+            JOIN games ON shop.game = games.id
+            WHERE shop.user = ?
+        `, [userId]);
+
+        res.json(results);
+    } catch (error) {
+        console.error('Erro ao buscar compras:', error);
+        res.status(500).json({ message: 'Erro interno no servidor ao buscar compras' });
     }
 });
 

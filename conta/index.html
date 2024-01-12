@@ -164,14 +164,14 @@ margin-top: 40px; /* Faz o footer ficar no final da página */
           <h1 style="color: white; font-size: 24px; cursor: pointer;" onclick="voltar()">Gamedan</h1>
         </div>
         <div class="right-section">
-            <div class="shop" style="height: 40px;">
+            <div class="shop" style="height: 40px;" onclick="shop()">
                 <div class="icon">
                     <img class="icon" src="https://i.postimg.cc/QCLr7D8C/vista-lateral-vazia-do-carrinho-de-compras-2.png" alt="shop">
                 </div>
                 <h1 style="color: white;"> Shop</h1>
             </div>
             
-            <div class="conta" style="height: 40px;">
+            <div class="conta" style="height: 40px;" >
                 <div class="icon">
                     <img class="icon" src="https://i.postimg.cc/XYLYdrBP/do-utilizador.png" alt="conta">
                 </div>
@@ -253,7 +253,9 @@ margin-top: 40px; /* Faz o footer ficar no final da página */
         // Redirecionar para a página de login
         window.location.href = '/jogos';  // Alterado para redirecionar para /jogos em vez de /login
     }
-
+    function shop(){
+        window.location.href = './shop';
+    }
 </script>
 
     

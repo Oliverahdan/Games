@@ -3,8 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" type="text/css" href="/jogos/jogos.css">
-    <title>Game</title>
+    <title>Gamedan</title>
     <style>
         .body {
   font-family: Arial, sans-serif;
@@ -303,13 +302,13 @@ height: 100px; /* Isso garante que a altura seja ajustada automaticamente, mante
 
       <section class="rectangles-container">
         <div class="categorias">
-            <div class="categoria-item">
+            <div class="categoria-item" id="acao">
                 <h2 style="margin-right: 10px;">Ação</h2>
             </div>
-            <div class="categoria-item">
+            <div class="categoria-item" id="corrida">
                 <h2 style="margin-right: 10px;">Corrida</h2>
             </div>
-            <div class="categoria-item">
+            <div class="categoria-item" id="luta">
                 <h2 style="margin-right: 10px;">Luta</h2>
             </div>
         </div>
@@ -454,6 +453,62 @@ function updateGameList(selectedGame) {
         })
         .catch(error => console.error('Erro ao buscar dados do servidor:', error));
 }
+
+$(document).ready(function () {
+    let allGames = [];  // Lista completa de jogos
+
+    // Adicione eventos de clique a cada elemento de categoria
+    $('.categoria-item#acao').click(function () {
+        console.log('Clicou em Ação');
+        updateGameListByCategory('action');
+    });
+
+    $('.categoria-item#corrida').click(function () {
+        console.log('Clicou em Corrida');
+        updateGameListByCategory('race');
+    });
+
+    $('.categoria-item#luta').click(function () {
+        console.log('Clicou em Luta');
+        updateGameListByCategory('fight');
+    });
+
+    // Fazer uma solicitação AJAX para obter apenas os jogos da categoria correspondente
+    function updateGameListByCategory(category) {
+    console.log('Categoria selecionada:', category);
+
+    // Fazer uma solicitação AJAX para obter apenas os jogos da categoria correspondente
+    fetch(`/api/jogos?category=${encodeURIComponent(category)}`)
+        .then(response => response.json())
+        .then(data => {
+            console.log('Dados da API:', data);
+
+            const jogosSection = document.querySelector('.jogos');
+            jogosSection.innerHTML = ''; // Limpar a seção de jogos
+
+            // Iterar sobre os dados e adicionar à seção "jogos"
+            data.forEach(jogo => {
+                const jogoElement = document.createElement('div');
+                jogoElement.classList.add('jogo');
+                jogoElement.innerHTML = `<a href="/descricao?id=${jogo.id}&timestamp=${Date.now()}"><img class="imgjogo" src="${jogo.image}" alt="fim"></a>`;
+                jogosSection.appendChild(jogoElement);
+            });
+        })
+        .catch(error => console.error('Erro ao buscar dados do servidor:', error));
+}
+
+
+
+    // Simulação de obtenção da lista completa de jogos do servidor (você deve adaptar isso com a lógica real)
+    fetch('/api/jogos')
+        .then(response => response.json())
+        .then(data => {
+            allGames = data; // Armazenar a lista completa de jogos
+            // Aqui você pode inicializar a lista completa de jogos com base na resposta do servidor
+        })
+        .catch(error => console.error('Erro ao obter a lista completa de jogos:', error));
+});
+
 
     </script>
 </body>

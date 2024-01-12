@@ -3,7 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="styles.css">
     <style>
         body {
             display: flex;
@@ -152,7 +151,7 @@ margin-top: 40px; /* Faz o footer ficar no final da página */
         border-radius: 20px;
     }
     </style>
-    <title>Game</title>
+    <title>Gamedan</title>
 </head>
 <body>
 <div class="body">
@@ -162,7 +161,7 @@ margin-top: 40px; /* Faz o footer ficar no final da página */
             <img class="icon" src="https://i.postimg.cc/XYLYdrBP/do-utilizador.png" alt="conta">
 
           </div>
-          <h1 style="color: white;">Gamedan</h1>
+          <h1 style="color: white; font-size: 24px; cursor: pointer;" onclick="voltar()">Gamedan</h1>
         </div>
         <div class="right-section">
             <div class="shop" style="height: 40px;">
@@ -205,6 +204,9 @@ margin-top: 40px; /* Faz o footer ficar no final da página */
 </footer>
 </body>
 <script>
+    function voltar(){
+            window.location.href = './jogos';
+        }
     document.addEventListener('DOMContentLoaded', () => {
         const userId = getCookie('userId');
         const loginButtonContainer = document.getElementById('loginButtonContainer');

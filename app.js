@@ -25,7 +25,10 @@ app.use(cookieParser());
 
 // Middleware para garantir a criação de uma nova conexão antes de cada rota
 app.use(async (req, res, next) => {
-    req.connection = await createConnection();
+    req.locals = {}; // Criar um objeto locals para armazenar variáveis locais
+
+    // Criar uma nova conexão e armazená-la em req.locals.connection
+    req.locals.connection = await createConnection();
     next();
 });
 
@@ -39,7 +42,7 @@ app.get('/descricao', async (req, res) => {
 
         console.log('Recebido pedido para o jogo com ID:', gameId);
 
-        const [rows, fields] = await req.connection.execute('SELECT * FROM games WHERE id = ?', [gameId]);
+        const [rows, fields] = await req.locals.connection.execute('SELECT * FROM games WHERE id = ?', [gameId]);
 
         if (rows.length === 0) {
             console.log('Jogo não encontrado no banco de dados');
@@ -77,7 +80,6 @@ app.post('/comprar', async (req, res) => {
     const gameId = req.body.gameId;
     const userId = req.body.userId;
 
-    // Verificar se o usuário está autenticado usando cookies
     const userCookie = req.cookies.userId;
 
     if (!userCookie || userCookie !== userId) {
@@ -85,15 +87,8 @@ app.post('/comprar', async (req, res) => {
     }
 
     try {
-        const connection = await createConnection();
-
-        // Inserir informações na tabela 'shop'
-        const [results] = await connection.execute('INSERT INTO shop (game, user) VALUES (?, ?)', [gameId, userId]);
-
+        const [results] = await req.connection.execute('INSERT INTO shop (game, user) VALUES (?, ?)', [gameId, userId]);
         res.json({ message: 'Compra realizada com sucesso' });
-
-        // Fechar a conexão
-        await connection.end();
     } catch (error) {
         console.error('Erro ao realizar a compra:', error);
         res.status(500).json({ message: 'Erro interno no servidor ao realizar a compra' });
@@ -121,19 +116,44 @@ app.get('/api/user/:id', async (req, res) => {
 });
 
 
-  app.get('/api/jogos', async (req, res) => {
+app.get('/api/jogos', async (req, res) => {
     try {
         const searchTerm = req.query.name ? req.query.name.toLowerCase() : null;
+        const category = req.query.category || null;
 
         const connection = await createConnection();
-        
+
+        // Log para verificar as consultas SQL geradas
+        console.log('Generated SQL for searchTerm:', searchTerm);
+        console.log('Generated SQL for category:', category);
+
         // Se houver um termo de pesquisa, realizar uma consulta filtrada
         if (searchTerm) {
-            const [rows, fields] = await connection.execute('SELECT * FROM games WHERE LOWER(name) LIKE ?', [`%${searchTerm}%`]);
+            let query = 'SELECT * FROM games WHERE LOWER(name) LIKE ?';
+            const params = [`%${searchTerm}%`];
+
+            // Adicione a condição da categoria se fornecida
+            if (category) {
+                query += ' AND FIND_IN_SET(?, categories) > 0';
+                params.push(category);
+            }
+
+            const [rows, fields] = await connection.execute(query, params);
+            console.log('Result for searchTerm:', rows);
             res.json(rows);
         } else {
-            // Caso contrário, obter todos os jogos
-            const [rows, fields] = await connection.execute('SELECT * FROM games');
+            // Caso contrário, obter todos os jogos ou jogos por categoria
+            let query = 'SELECT * FROM games';
+            const params = [];
+
+            // Adicione a condição da categoria se fornecida
+            if (category) {
+                query += ' WHERE FIND_IN_SET(?, categories) > 0';
+                params.push(category);
+            }
+
+            const [rows, fields] = await connection.execute(query, params);
+            console.log('Result for category:', rows);
             res.json(rows);
         }
 
@@ -143,6 +163,9 @@ app.get('/api/user/:id', async (req, res) => {
         res.status(500).send('Erro interno do servidor');
     }
 });
+
+
+
 
 // Rota para salvar usuário host
 app.post('/api/userhost', async (req, res) => {
@@ -199,8 +222,8 @@ app.get('/', async (req, res) => {
 
 // Rota para fechar a conexão ao final de cada requisição
 app.use((req, res, next) => {
-    if (connection) {
-        connection.end();
+    if (req.locals.connection) {
+        req.locals.connection.end();
     }
     next();
 });

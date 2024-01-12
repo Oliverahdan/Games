@@ -33,9 +33,8 @@ app.get('/descricao', async (req, res) => {
 
         console.log('Recebido pedido para o jogo com ID:', gameId);
 
-        const connection = await createConnection();
-        const [rows, fields] = await connection.execute('SELECT * FROM games WHERE id = ?', [gameId]);
-        
+        const [rows, fields] = await req.connection.execute('SELECT * FROM games WHERE id = ?', [gameId]);
+
         if (rows.length === 0) {
             console.log('Jogo não encontrado no banco de dados');
             return res.status(404).send('Jogo não encontrado');
@@ -43,35 +42,88 @@ app.get('/descricao', async (req, res) => {
 
         console.log('Dados do jogo encontrado:', rows[0]);
 
-        // Renderiza a página descricao.html com os dados do jogo
         res.sendFile(path.join(__dirname, '/descricao/index.html'));
-
-        // Não fechamos a conexão aqui para que ela esteja disponível para outras rotas
     } catch (error) {
         console.error('Erro na consulta ao banco de dados:', error);
         res.status(500).send('Erro interno no servidor');
     }
 });
 
-// API endpoint for user login
-app.post('/login', (req, res) => {
-    const { nome, email } = req.body;
-  
-    // Retrieve user data from the 'users' table
-    connection.query('SELECT * FROM users WHERE name = ? AND password = ?', [nome, email], (err, results) => {
-      if (err) {
-        return res.status(500).json({ message: 'Erro no servidor' });
-      }
-  
-      if (results.length === 0) {
-        return res.status(401).json({ message: 'Credenciais inválidas' });
-      }
+app.post('/login', async (req, res) => {
+    const { email, senha } = req.body;
 
-  
-      // Redirecione o usuário para a página de grupo
-      res.redirect('/jogos');
-    });
-  });
+    try {
+        const connection = await createConnection();
+
+        // Retrieve user data from the 'users' table
+        const [results] = await connection.execute('SELECT * FROM users WHERE email = ? AND password = ?', [email, senha]);
+
+        // Verificar se encontrou algum usuário
+        if (results.length === 0) {
+            res.status(401).json({ message: 'Credenciais inválidas' });
+        } else {
+            // Definir um cookie após o login bem-sucedido
+            res.cookie('userId', results[0].id);
+
+            // Redirecione o usuário para a página de jogos
+            res.redirect('/jogos');
+        }
+
+        // Fechar a conexão
+        await connection.end();
+    } catch (error) {
+        console.error('Erro no servidor:', error);
+        res.status(500).json({ message: 'Erro no servidor' });
+    }
+});
+
+app.post('/comprar', async (req, res) => {
+    const gameId = req.body.gameId;
+    const userId = req.body.userId;
+
+    // Verificar se o usuário está autenticado usando cookies
+    const userCookie = req.cookies.userId;
+
+    if (!userCookie || userCookie !== userId) {
+        return res.status(401).json({ message: 'Usuário não autenticado' });
+    }
+
+    try {
+        const connection = await createConnection();
+
+        // Inserir informações na tabela 'shop'
+        const [results] = await connection.execute('INSERT INTO shop (game, user) VALUES (?, ?)', [gameId, userId]);
+
+        res.json({ message: 'Compra realizada com sucesso' });
+
+        // Fechar a conexão
+        await connection.end();
+    } catch (error) {
+        console.error('Erro ao realizar a compra:', error);
+        res.status(500).json({ message: 'Erro interno no servidor ao realizar a compra' });
+    }
+});
+
+app.get('/api/user/:id', async (req, res) => {
+    const userId = req.params.id;
+
+    try {
+        const connection = await createConnection();
+        const [results] = await connection.execute('SELECT * FROM users WHERE id = ?', [userId]);
+
+        if (results.length === 0) {
+            res.status(404).json({ message: 'Usuário não encontrado' });
+        } else {
+            res.json(results[0]);
+        }
+
+        await connection.end();
+    } catch (error) {
+        console.error('Erro no servidor:', error);
+        res.status(500).json({ message: 'Erro no servidor' });
+    }
+});
+
 
   app.get('/api/jogos', async (req, res) => {
     try {
@@ -141,9 +193,20 @@ app.get('/shop', async (req, res) => {
 app.get('/jogos', async (req, res) => {
     res.sendFile(path.join(__dirname, '/jogos/index.html'));
 });
+app.get('/conta', async (req, res) => {
+    res.sendFile(path.join(__dirname, '/conta/index.html'));
+});
 
 app.get('/', async (req, res) => {
     res.sendFile(path.join(__dirname, '/jogos/index.html'));
+});
+
+// Rota para fechar a conexão ao final de cada requisição
+app.use((req, res, next) => {
+    if (connection) {
+        connection.end();
+    }
+    next();
 });
 
 app.listen(port, () => {

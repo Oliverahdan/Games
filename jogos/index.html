@@ -291,7 +291,7 @@ height: 100px; /* Isso garante que a altura seja ajustada automaticamente, mante
                 <h1 style="color: white;"> Shop</h1>
             </div>
             
-            <div class="conta" style="height: 40px;" onclick="toggleLogin()">
+            <div class="conta" style="height: 40px;" onclick="conta()">
                 <div class="icon">
                     <img class="icon" src="https://i.postimg.cc/XYLYdrBP/do-utilizador.png" alt="conta">
                 </div>
@@ -373,6 +373,9 @@ height: 100px; /* Isso garante que a altura seja ajustada automaticamente, mante
 
             slides.style.transform = `translateX(${-100 * (slideIndex - 1)}%)`;
         }
+        function conta(){
+        window.location.href = './conta';
+    }
         function shop(){
             window.location.href = './shop';
         }

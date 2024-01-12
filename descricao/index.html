@@ -202,16 +202,12 @@ margin-top: 40px; /* Faz o footer ficar no final da página */
             </div>
             
             <div class="contabotao">
-                <div class="conta" style="height: 40px;" onclick="toggleLogin()">
+                <div class="conta" style="height: 40px;" onclick="conta()">
                     <div class="icon">
                         <img class="icon" src="https://i.postimg.cc/XYLYdrBP/do-utilizador.png" alt="conta">
                     </div>
                     <h1 style="color: white;"> Conta</h1>
                 </div>
-        
-                    <div class="login" id="login" style="cursor: pointer; font-size: 12px; margin-left: 30px;">
-                        <h1>Login</h1>
-                    </div>
             </div>
 
         </div>
@@ -230,7 +226,7 @@ margin-top: 40px; /* Faz o footer ficar no final da página */
                         <img class="imgestrela"  src="https://i.postimg.cc/TYhQhV9g/estrela-2.png" alt="">
                         <img class="imgestrela"  src="https://i.postimg.cc/TYhQhV9g/estrela-2.png" alt="">
                     </div>
-                    <button class="b" style="width: 200px; height: 80px; border-radius: 20px; font-size:large; cursor: pointer;">comprar</button>
+                    <button class="b" style="width: 200px; height: 80px; border-radius: 20px; font-size: large; cursor: pointer;" onclick="comprarJogo()">comprar</button>
                 </div>
             <p id="descricaoJogo" style="color: white; margin-top: 50px;"></p>
             <!-- Adicione mais informações do jogo conforme necessário -->
@@ -257,10 +253,43 @@ margin-top: 40px; /* Faz o footer ficar no final da página */
 
 <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
 <script>
-        function toggleLogin() {
-    $('#login').toggle();
-}
+   function obterIdDoJogo() {
+        // Implemente a lógica para obter o ID do jogo
+        // Aqui, você pode usar a lógica existente ou ajustar conforme necessário
+        const params = new URLSearchParams(window.location.search);
+        return params.get('id');
+    }
 
+    function comprarJogo() {
+        const gameId = obterIdDoJogo();  // Chame a função para obter o ID do jogo
+        const userId = obterIdDoUsuario();  // Implemente a lógica para obter o ID do usuário
+
+        // Enviar uma solicitação POST para a rota /comprar
+        fetch('/comprar', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ gameId, userId }),
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log(data.message);
+            
+            // Exibir um alerta indicando que a compra foi bem-sucedida
+            alert('Compra realizada com sucesso!');
+
+            // Implemente qualquer lógica adicional após a compra bem-sucedida, se necessário
+        })
+        .catch(error => {
+            console.error('Erro ao comprar o jogo:', error);
+            // Implemente qualquer lógica adicional em caso de erro
+        });
+    }
+
+    function conta(){
+        window.location.href = './conta';
+    }
     function shop(){
         window.location.href = './shop';
     }

@@ -136,6 +136,21 @@ margin-top: 40px; /* Faz o footer ficar no final da página */
             padding: 8px 12px;
             cursor: pointer;
         }
+
+
+        #loginButtonContainer {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        flex-direction: column; /* Isso faz com que a div ocupe toda a altura da viewport */
+    }
+
+    #loginButton{
+        height: 100px;
+        width: 200px;
+        border-radius: 20px;
+    }
     </style>
     <title>Game</title>
 </head>
@@ -167,18 +182,76 @@ margin-top: 40px; /* Faz o footer ficar no final da página */
         </div>
     </header>
     
-<section>
-    conta
-</section>
+    <section>  <!-- Se houver usuário logado, exibir as informações do usuário -->
+        <div class="contauser" style="height: 40px;">
+            <h1 style="color: white;" id="userName"></h1>
+        </div>
+    </section>
+
+   <!-- Se não houver usuário logado, exibir o botão de login -->
+    <div class="center-content" id="loginButtonContainer">
+        <span style="color: white; margin-bottom: 20px; font-size: 30px;">Você não esta logado clique para entrar na sua conta</span>
+        <button id="loginButton" onclick="window.location.href='/login'">Login</button>
+        </div>
+
+        <div>            <!-- Adicionando botão de sair -->
+                    <button id="logoutButton" onclick="logout()">Sair</button>
+        </div>
 
 </div>
 <footer class="footer">
     <img src="https://i.postimg.cc/FzBrkz8f/circulo-c-1.png" alt="fim" style="width: 15px; height: 15px; margin-right: 5px;">
     <span>2024 Gamedan</span>
 </footer>
-
+</body>
 <script>
-   
+    document.addEventListener('DOMContentLoaded', () => {
+        const userId = getCookie('userId');
+        const loginButtonContainer = document.getElementById('loginButtonContainer');
+        const logoutButton = document.getElementById('logoutButton');
+
+        if (userId) {
+            // Usuário logado, carregar informações do usuário
+            loadUserInfo(userId);
+            // Esconder o botão de login
+            loginButtonContainer.style.display = 'none';
+            // Mostrar o botão de logout
+            logoutButton.style.display = 'block';
+        } else {
+            // Se não houver usuário logado, exibir o botão de login
+            loginButtonContainer.style.display = 'flex';
+            // Esconder o botão de logout
+            logoutButton.style.display = 'none';
+
+    
+        }
+    });
+
+    async function loadUserInfo(userId) {
+        try {
+            const response = await fetch(`/api/user/${userId}`);
+            const userData = await response.json();
+
+            // Exibir o nome do usuário na seção "Conta"
+            const userNameElement = document.getElementById('userName');
+            userNameElement.textContent = userData.name;
+        } catch (error) {
+            console.error('Erro ao carregar informações do usuário:', error);
+        }
+    }
+
+    function getCookie(name) {
+        const match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
+        return match ? match[2] : null;
+    }
+
+    function logout() {
+        // Limpar o cookie de ID do usuário
+        document.cookie = 'userId=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+        // Redirecionar para a página de login
+        window.location.href = '/jogos';  // Alterado para redirecionar para /jogos em vez de /login
+    }
+
 </script>
 
     

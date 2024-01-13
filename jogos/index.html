@@ -42,6 +42,7 @@ header {
   cursor: pointer;
   padding: 5px;
   border-radius: 5px;
+  transition: background-color 0.3s ease;
 }
 .conta{
   display: flex;
@@ -50,6 +51,7 @@ header {
   cursor: pointer;
   padding: 5px;
   border-radius: 5px;
+  transition: background-color 0.3s ease;
 }
 
 div.icon {
@@ -95,7 +97,9 @@ img.icon{
 .categoria-item:hover {
   background-color: #3a3b3f; /* Cor mais clara ao passar o mouse */
 }
-
+.categoria-item.selected {
+            background-color: #3a3b3f; /* Cor de fundo quando a categoria está selecionada */
+ }
 
 .slideshow-container {
 max-width: 100%;
@@ -268,6 +272,49 @@ height: 100px; /* Isso garante que a altura seja ajustada automaticamente, mante
             color: white;
         }
 
+        .jogo-container {
+    position: relative;
+    overflow: hidden;
+}
+
+.nome-jogo-overlay {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    text-align: center;
+    color: white;
+}
+
+.jogo-container:hover .imgjogo {
+    filter: blur(5px); /* Adicione o efeito de desfoque quando o mouse estiver sobre o contêiner */
+}
+
+.jogo-container:hover .nome-jogo-overlay {
+    opacity: 1; /* Mostre a sobreposição quando o mouse estiver sobre o contêiner */
+}
+
+.game-name-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background-color: rgba(0, 0, 0, 0.7);
+    color: white;
+    text-align: center;
+    padding: 10px;
+    font-size: 16px;
+    display: none;
+    transition: opacity 0.3s;
+}
+
+.slide:hover .game-name-overlay {
+    display: block;
+}
+
+
     </style>
 </head>
 <body>
@@ -320,21 +367,34 @@ height: 100px; /* Isso garante que a altura seja ajustada automaticamente, mante
 
     <section class="slideshow-container" style="position: relative; z-index: 1;">
         <div class="slides">
-            <div class="slide"><img src="https://i.postimg.cc/vTbtVSrx/spider.png" alt="Imagem 1" style="width: 100%; height: 100%;"></div>
-            <div class="slide"><img src="https://i.postimg.cc/HLthP56M/tlou2.jpg" alt="Imagem 2"  style="width: 100%; height: 100%;"></div>
-            <div class="slide"><img src="https://i.postimg.cc/PqFxg6rs/Forza-Horizon-3-capa.png" alt="Imagem 3" style="width: 100%; height: 100%;"></div>
-            <div class="slide"><img src="https://i.postimg.cc/9QXVpGP6/mortal-kombat.jpg" alt="Imagem 4" style="width: 100%; height: 100%;"></div>
+            <div class="slide" onmouseover="showGameName(this)" onmouseout="hideGameName(this)">
+                <img src="https://i.postimg.cc/vTbtVSrx/spider.png" alt="Imagem 1" style="width: 100%; height: 100%;">
+                <div class="game-name-overlay">Spider-Man</div>
+            </div>
+            <div class="slide" onmouseover="showGameName(this)" onmouseout="hideGameName(this)">
+                <img src="https://i.postimg.cc/HLthP56M/tlou2.jpg" alt="Imagem 2" style="width: 100%; height: 100%;">
+                <div class="game-name-overlay">The Last of Us Part II</div>
+            </div>
+            <div class="slide" onmouseover="showGameName(this)" onmouseout="hideGameName(this)">
+                <img src="https://i.postimg.cc/PqFxg6rs/Forza-Horizon-3-capa.png" alt="Imagem 3" style="width: 100%; height: 100%;">
+                <div class="game-name-overlay">Forza Horizon 3</div>
+            </div>
+            <div class="slide" onmouseover="showGameName(this)" onmouseout="hideGameName(this)">
+                <img src="https://i.postimg.cc/9QXVpGP6/mortal-kombat.jpg" alt="Imagem 4" style="width: 100%; height: 100%;">
+                <div class="game-name-overlay">Mortal Kombat</div>
+            </div>
         </div>
-
+    
         <button class="prev" onclick="plusSlides(-1)">❮</button>
         <button class="next" onclick="plusSlides(1)">❯</button>
     </section>
+    
     <br>
     <p style="color: white; font-size: 30px;">Lista de jogos</p>
     <br>
-    <section class="jogos">
-
-   </section>
+    <section class="jogos" id="jogosContainer">
+    </section>
+    
 
 </div>
 
@@ -345,168 +405,187 @@ height: 100px; /* Isso garante que a altura seja ajustada automaticamente, mante
 </footer>
 <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
     <script>
-        let slideIndex = 1;
-        showSlides(slideIndex);
+  let slideIndex = 1;
+    showSlides();
 
-        function plusSlides(n) {
-            showSlides(slideIndex += n);
+    function plusSlides(n) {
+        showSlides(slideIndex += n);
+    }
+
+    function currentSlide(n) {
+        showSlides(slideIndex = n);
+    }
+
+    function showSlides() {
+        let i;
+        const slides = document.getElementsByClassName("slide");
+        const gameNameOverlays = document.querySelectorAll('.game-name-overlay');
+
+        for (i = 0; i < slides.length; i++) {
+            slides[i].style.display = "none";
+            gameNameOverlays[i].style.display = 'none';
         }
 
-        function currentSlide(n) {
-            showSlides(slideIndex = n);
+        if (slideIndex > slides.length) {
+            slideIndex = 1;
         }
 
-        function showSlides(n) {
-            let i;
-            const slides = document.querySelector('.slides');
-
-            if (n > slides.children.length) {
-                slideIndex = 1;
-            }
-
-            if (n < 1) {
-                slideIndex = slides.children.length;
-            }
-
-            slides.style.transform = `translateX(${-100 * (slideIndex - 1)}%)`;
+        if (slideIndex < 1) {
+            slideIndex = slides.length;
         }
-        function conta(){
+
+        slides[slideIndex - 1].style.display = "block";
+        gameNameOverlays[slideIndex - 1].style.display = 'block';
+    }
+
+    function showGameName(slide) {
+        const gameNameOverlay = slide.querySelector('.game-name-overlay');
+        gameNameOverlay.style.display = 'block';
+    }
+
+    function hideGameName(slide) {
+        const gameNameOverlay = slide.querySelector('.game-name-overlay');
+        gameNameOverlay.style.display = 'none';
+    }
+    function conta() {
         window.location.href = './conta';
     }
-        function shop(){
-            window.location.href = './shop';
-        }
-        
-// Adicione este código no seu script no HTML
 
-fetch('/api/jogos')
-    .then(response => response.json())
-    .then(data => {
-        const jogosSection = document.querySelector('.jogos');
-
-        // Itera sobre os dados e adiciona à seção "jogos"
-                data.forEach(jogo => {
-            const jogoElement = document.createElement('div');
-            jogoElement.classList.add('jogo');
-            jogoElement.innerHTML = `<a href="/descricao?id=${jogo.id}&timestamp=${Date.now()}"><img class="imgjogo" src="${jogo.image}" alt="fim">`;
-            jogosSection.appendChild(jogoElement);
-        });
-    })
-    .catch(error => console.error('Erro ao buscar dados do servidor:', error));
-
-    $(document).ready(function() {
-    // Monitorar alterações no campo de pesquisa
-    $('#searchInput').on('input', function() {
-        const searchTerm = $(this).val().toLowerCase();
-
-        // Fazer uma solicitação AJAX para obter a lista de jogos
-        $.get('/api/jogos', { name: searchTerm }, function(data) {
-            const jogosSection = document.querySelector('.jogos');
-            jogosSection.innerHTML = ''; // Limpar a seção de jogos
-
-            // Iterar sobre os dados e adicionar à seção "jogos"
-            data.forEach(jogo => {
-                const jogoElement = document.createElement('div');
-                jogoElement.classList.add('jogo');
-                jogoElement.innerHTML = `<a href="/descricao?id=${jogo.id}&timestamp=${Date.now()}"><img class="imgjogo" src="${jogo.image}" alt="fim">`;
-                jogosSection.appendChild(jogoElement);
-            });
-        });
-    });
-
-    // Manipular o clique em um jogo na lista suspensa
-    $('#gameList').on('change', function () {
-        const selectedGame = $(this).val();
-        // Atualizar a lista de jogos com o jogo selecionado
-        updateGameList(selectedGame);
-    });
-});
-
-// Adicione esta função para lidar com o caso em que a pesquisa é apagada
-$('#searchInput').on('search', function() {
-    const searchTerm = $(this).val();
-    if (!searchTerm) {
-        // Se a pesquisa for apagada, obter a lista completa de jogos
-        updateGameList(); // Chamar a função sem argumentos busca todos os jogos
+    function shop() {
+        window.location.href = './shop';
     }
-});
 
+    // Adicione este código no seu script no HTML
 
-function updateGameList(selectedGame) {
-    // Fazer uma solicitação AJAX para obter apenas o jogo correspondente
-    fetch(`/api/jogos?name=${selectedGame}`)
-        .then(response => response.json())
-        .then(data => {
-            const jogosSection = document.querySelector('.jogos');
-            jogosSection.innerHTML = ''; // Limpar a seção de jogos
-
-            // Adicionar apenas o jogo correspondente à seção "jogos"
-            const jogo = data[0];
-            if (jogo) {
-                const jogoElement = document.createElement('div');
-                jogoElement.classList.add('jogo');
-                jogoElement.innerHTML = `<a href="/descricao?id=${jogo.id}&timestamp=${Date.now()}"><img class="imgjogo" src="${jogo.image}" alt="fim">`;
-                jogosSection.appendChild(jogoElement);
-            }
-        })
-        .catch(error => console.error('Erro ao buscar dados do servidor:', error));
-}
-
-$(document).ready(function () {
-    let allGames = [];  // Lista completa de jogos
-
-    // Adicione eventos de clique a cada elemento de categoria
-    $('.categoria-item#acao').click(function () {
-        console.log('Clicou em Ação');
-        updateGameListByCategory('action');
-    });
-
-    $('.categoria-item#corrida').click(function () {
-        console.log('Clicou em Corrida');
-        updateGameListByCategory('race');
-    });
-
-    $('.categoria-item#luta').click(function () {
-        console.log('Clicou em Luta');
-        updateGameListByCategory('fight');
-    });
-
-    // Fazer uma solicitação AJAX para obter apenas os jogos da categoria correspondente
-    function updateGameListByCategory(category) {
-    console.log('Categoria selecionada:', category);
-
-    // Fazer uma solicitação AJAX para obter apenas os jogos da categoria correspondente
-    fetch(`/api/jogos?category=${encodeURIComponent(category)}`)
-        .then(response => response.json())
-        .then(data => {
-            console.log('Dados da API:', data);
-
-            const jogosSection = document.querySelector('.jogos');
-            jogosSection.innerHTML = ''; // Limpar a seção de jogos
-
-            // Iterar sobre os dados e adicionar à seção "jogos"
-            data.forEach(jogo => {
-                const jogoElement = document.createElement('div');
-                jogoElement.classList.add('jogo');
-                jogoElement.innerHTML = `<a href="/descricao?id=${jogo.id}&timestamp=${Date.now()}"><img class="imgjogo" src="${jogo.image}" alt="fim"></a>`;
-                jogosSection.appendChild(jogoElement);
-            });
-        })
-        .catch(error => console.error('Erro ao buscar dados do servidor:', error));
-}
-
-
-
-    // Simulação de obtenção da lista completa de jogos do servidor (você deve adaptar isso com a lógica real)
     fetch('/api/jogos')
         .then(response => response.json())
         .then(data => {
-            allGames = data; // Armazenar a lista completa de jogos
-            // Aqui você pode inicializar a lista completa de jogos com base na resposta do servidor
-        })
-        .catch(error => console.error('Erro ao obter a lista completa de jogos:', error));
-});
+                const jogosSection = document.querySelector('#jogosContainer');
+                jogosSection.innerHTML = ''; // Limpar a seção de jogos
 
+                // Iterar sobre os dados e adicionar à seção "jogos"
+                data.forEach(jogo => {
+                    const jogoContainer = document.createElement('div');
+                    jogoContainer.classList.add('jogo-container');
+
+                    const jogoElement = document.createElement('div');
+                    jogoElement.classList.add('jogo');
+                    jogoElement.innerHTML = `<a href="/descricao?id=${jogo.id}&timestamp=${Date.now()}"><img class="imgjogo" src="${jogo.image}" alt="fim"></a>`;
+
+                    // Verificar se a propriedade 'nome' está definida antes de usá-la
+                    const nomeJogoOverlay = document.createElement('div');
+                    nomeJogoOverlay.classList.add('nome-jogo-overlay');
+                    if (jogo.name) {
+                        nomeJogoOverlay.innerHTML = `<p>${jogo.name}</p>`;
+                    }
+
+                    jogoContainer.appendChild(jogoElement);
+                    jogoContainer.appendChild(nomeJogoOverlay);
+
+                    jogosSection.appendChild(jogoContainer);
+                });
+            })
+            .catch(error => console.error('Erro ao buscar dados do servidor:', error));
+    $(document).ready(function () {
+        // Monitorar alterações no campo de pesquisa
+        $('#searchInput').on('input', function () {
+            const searchTerm = $(this).val().toLowerCase();
+
+            // Fazer uma solicitação AJAX para obter a lista de jogos
+            $.get('/api/jogos', { name: searchTerm }, function (data) {
+                const jogosSection = document.querySelector('.jogos');
+                jogosSection.innerHTML = ''; // Limpar a seção de jogos
+
+                // Iterar sobre os dados e adicionar à seção "jogos"
+                data.forEach(jogo => {
+                    const jogoElement = document.createElement('div');
+                    jogoElement.classList.add('jogo');
+                    jogoElement.innerHTML = `<a href="/descricao?id=${jogo.id}&timestamp=${Date.now()}"><img class="imgjogo" src="${jogo.image}" alt="fim"></a>`;
+                    jogosSection.appendChild(jogoElement);
+                });
+            });
+        });
+
+        // Manipular o clique em um jogo na lista suspensa
+        $('#gameList').on('change', function () {
+            const selectedGame = $(this).val();
+            // Atualizar a lista de jogos com o jogo selecionado
+            updateGameList(selectedGame);
+        });
+
+        // Adicione esta função para lidar com o caso em que a pesquisa é apagada
+        $('#searchInput').on('search', function () {
+            const searchTerm = $(this).val();
+            if (!searchTerm) {
+                // Se a pesquisa for apagada, obter a lista completa de jogos
+                updateGameList(); // Chamar a função sem argumentos busca todos os jogos
+            }
+        });
+
+        let allGames = [];  // Lista completa de jogos
+
+        // Adicione eventos de clique a cada elemento de categoria
+        $('.categoria-item#acao').click(function () {
+            toggleCategory('action');
+            
+        });
+
+        $('.categoria-item#corrida').click(function () {
+            toggleCategory('race');
+        });
+
+        $('.categoria-item#luta').click(function () {
+            toggleCategory('fight');
+        });
+
+        // Fazer uma solicitação AJAX para obter apenas os jogos da categoria correspondente
+        function updateGameListByCategory(category) {
+            console.log('Categoria selecionada:', category);
+
+            // Fazer uma solicitação AJAX para obter apenas os jogos da categoria correspondente
+            fetch(`/api/jogos?category=${encodeURIComponent(category)}`)
+                .then(response => response.json())
+                .then(data => {
+                    console.log('Dados da API:', data);
+
+                    const jogosSection = document.querySelector('.jogos');
+                    jogosSection.innerHTML = ''; // Limpar a seção de jogos
+
+                    // Iterar sobre os dados e adicionar à seção "jogos"
+                    data.forEach(jogo => {
+                        const jogoElement = document.createElement('div');
+                        jogoElement.classList.add('jogo');
+                        jogoElement.innerHTML = `<a href="/descricao?id=${jogo.id}&timestamp=${Date.now()}"><img class="imgjogo" src="${jogo.image}" alt="fim"></a>`;
+                        jogosSection.appendChild(jogoElement);
+                    });
+                })
+                .catch(error => console.error('Erro ao buscar dados do servidor:', error));
+        }
+
+        function toggleCategory(category) {
+            const categoriaItem = $(`.categoria-item#${category}`);
+            const isCategorySelected = categoriaItem.hasClass('selected');
+
+            // Remover a seleção e mostrar todos os jogos se a categoria já estiver selecionada
+            if (isCategorySelected) {
+                categoriaItem.removeClass('selected');
+                updateGameList(); // Mostrar todos os jogos
+            } else {
+                // Adicionar a seleção e obter os jogos da categoria correspondente
+                categoriaItem.addClass('selected');
+                updateGameListByCategory(category);
+            }
+        }
+
+        // Simulação de obtenção da lista completa de jogos do servidor (você deve adaptar isso com a lógica real)
+        fetch('/api/jogos')
+            .then(response => response.json())
+            .then(data => {
+                allGames = data; // Armazenar a lista completa de jogos
+                // Aqui você pode inicializar a lista completa de jogos com base na resposta do servidor
+            })
+            .catch(error => console.error('Erro ao obter a lista completa de jogos:', error));
+    });
 
     </script>
 </body>

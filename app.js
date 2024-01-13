@@ -10,7 +10,7 @@ const port = 3000;
 const dbConfig = {
     host: 'localhost',
     user: 'root',
-    password: 'acesso123',
+    password: 'danisilva0304',
     database: 'gamedan'
 };
 

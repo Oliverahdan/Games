@@ -331,69 +331,7 @@ h1#nomeJogo{
 
 <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
 <script>
-function avaliarJogo() {
-    // Exibir a janela pop-up
-    const avaliar = confirm('Você gostaria de avaliar o jogo?');
-
-    if (avaliar) {
-        // O usuário escolheu avaliar, então obtenha a quantidade de estrelas
-        const qtEstrelas = obterQuantidadeEstrelasSelecionadas();
-
-        // Salvar a avaliação no banco de dados
-        salvarAvaliacao(qtEstrelas);
-    }
-}
-
-function obterQuantidadeEstrelasSelecionadas() {
-    // Percorrer as estrelas e contar quantas estão selecionadas
-    let qtEstrelas = 0;
-    $('.imgestrela').each(function() {
-        if ($(this).attr('src') === 'https://i.postimg.cc/nLnLCTwR/estrela-1.png') {
-            qtEstrelas++;
-        }
-    });
-    return qtEstrelas;
-}
-
-function salvarAvaliacao(qtEstrelas) {
-    const gameId = obterIdDoJogo();  // Obtenha o ID do jogo
-    const userId = obterIdDoUsuario();  // Obtenha o ID do usuário
-
-    // Verificar se o usuário está autenticado
-    if (!userId) {
-        // Se não estiver autenticado, redirecionar para a página de login
-        alert('Faça login para avaliar o jogo.');
-        window.location.href = '/login';  // Substitua '/login' pela rota real da sua página de login
-        return;
-    }
-
-    // Enviar uma solicitação POST para a rota de salvar avaliação
-    fetch('/salvar-avaliacao', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ qtEstrelas, gameId, userId }),
-    })
-    .then(response => response.json())
-    .then(data => {
-        console.log(data.message);
-
-        // Exibir um alerta indicando que a avaliação foi salva com sucesso
-        alert('Avaliação salva com sucesso!');
-
-        // Implemente qualquer lógica adicional após a avaliação ser salva com sucesso, se necessário
-    })
-    .catch(error => {
-        console.error('Erro ao salvar a avaliação:', error);
-        // Implemente qualquer lógica adicional em caso de erro
-    });
-}
-
-
-
-
-
+    
     function obterIdDoUsuario() {
     const cookiesString = document.cookie;
     const cookiesArray = cookiesString.split(';').map(cookie => cookie.trim());
@@ -473,23 +411,52 @@ function salvarAvaliacao(qtEstrelas) {
 
     if (gameId) {
         try {
+            // Buscar informações do jogo no banco de dados
             const response = await fetch(`/api/jogos?id=${gameId}&nocache=${noCache}`);
-            const data = await response.json();
+            
+            // Verificar se a resposta é bem-sucedida
+            if (!response.ok) {
+                console.error(`Erro na requisição: ${response.status} - ${response.statusText}`);
+                return;
+            }
 
-            const jogo = data.find(j => j.id == gameId); // Encontra o jogo com o ID correspondente
+            const contentType = response.headers.get('content-type');
 
-            if (jogo) {
-                document.getElementById('nomeJogo').innerText = jogo.name;
-                document.getElementById('imgJogo').src = jogo.image;
-                document.getElementById('descricaoJogo').innerText = jogo.description;
+            // Verificar se o tipo de conteúdo é JSON
+            if (contentType && contentType.includes('application/json')) {
+                const data = await response.json();
 
-                // Formatando o preço com "R$" na frente e substituindo "." por ","
-                const formattedPrice = `R$ ${jogo.price.replace('.', ',')}`;
-                document.getElementById('price').innerText = formattedPrice;
+                const jogo = data.find(j => j.id == gameId); // Encontra o jogo com o ID correspondente
 
-                // Preencha outras informações do jogo conforme necessário
+                if (jogo) {
+                    document.getElementById('nomeJogo').innerText = jogo.name;
+                    document.getElementById('imgJogo').src = jogo.image;
+                    document.getElementById('descricaoJogo').innerText = jogo.description;
+
+                    // Formatando o preço com "R$" na frente e substituindo "." por ","
+                    const formattedPrice = `R$ ${jogo.price.replace('.', ',')}`;
+                    document.getElementById('price').innerText = formattedPrice;
+
+                    // Buscar a quantidade de estrelas do banco de dados
+                    const starsResponse = await fetch(`/api/estrelas?gameId=${gameId}&userId=${obterIdDoUsuario()}`);
+                    
+                    // Verificar se a resposta é bem-sucedida
+                    if (!starsResponse.ok) {
+                        console.error(`Erro na requisição de estrelas: ${starsResponse.status} - ${starsResponse.statusText}`);
+                        return;
+                    }
+
+                    const starsData = await starsResponse.json();
+
+                    // Preencher as estrelas com base na quantidade do banco de dados
+                    preencherEstrelas(starsData.qt);
+
+                    // Preencha outras informações do jogo conforme necessário
+                } else {
+                    console.error('Jogo não encontrado');
+                }
             } else {
-                console.error('Jogo não encontrado');
+                console.error('A resposta não é do tipo JSON');
             }
         } catch (error) {
             console.error('Erro ao carregar informações do jogo:', error);
@@ -498,6 +465,40 @@ function salvarAvaliacao(qtEstrelas) {
         console.error('ID do jogo não fornecido');
     }
 }
+
+
+function preencherEstrelas(qtEstrelas) {
+    // Define as URLs das imagens
+    const normalImage = 'https://i.postimg.cc/TYhQhV9g/estrela-2.png';
+    const selectedImage = 'https://i.postimg.cc/nLnLCTwR/estrela-1.png';
+
+    // Percorre as estrelas e muda a imagem com base na quantidade
+    $('.imgestrela').each(function (i) {
+        if (i < qtEstrelas) {
+            // Índice menor que a quantidade de estrelas, portanto, a estrela está selecionada
+            $(this).attr('src', selectedImage);
+        } else {
+            // Índice maior ou igual à quantidade de estrelas, portanto, a estrela não está selecionada
+            $(this).attr('src', normalImage);
+        }
+    });
+}
+
+
+function exibirEstrelasUsuario(qtEstrelas) {
+    const selectedImage = 'https://i.postimg.cc/nLnLCTwR/estrela-1.png';
+    const normalImage = 'https://i.postimg.cc/TYhQhV9g/estrela-2.png';
+
+    // Percorrer as estrelas e definir a imagem com base na quantidade de estrelas
+    $('.imgestrela').each(function(i) {
+        if (i < qtEstrelas) {
+            $(this).attr('src', selectedImage);
+        } else {
+            $(this).attr('src', normalImage);
+        }
+    });
+}
+
 
 $(document).ready(function() {
         $('.imgestrela').click(function() {

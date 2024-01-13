@@ -169,7 +169,27 @@ app.delete('/excluir-compra/:game/:user', async (req, res) => {
     }
 });
 
-// Rota para salvar avaliação
+// Rota para obter a quantidade de estrelas
+app.get('/api/estrelas', async (req, res) => {
+    const gameId = parseInt(req.query.gameId);
+    const userId = parseInt(req.query.userId);
+
+    try {
+        const [ratingResults] = await req.locals.connection.execute('SELECT qt FROM stars WHERE game = ? AND user = ?', [gameId, userId]);
+
+        if (ratingResults.length > 0) {
+            res.json({ qt: ratingResults[0].qt });
+        } else {
+            res.status(404).json({ error: 'Avaliação não encontrada' });
+        }
+    } catch (error) {
+        console.error('Erro ao obter a avaliação do banco de dados:', error);
+        res.status(500).json({ message: 'Erro interno no servidor' });
+    }
+});
+
+
+/// Rota para salvar avaliação
 app.post('/salvar-avaliacao', async (req, res) => {
     const gameId = req.body.gameId;
     const userId = req.body.userId;
@@ -205,63 +225,10 @@ app.post('/salvar-avaliacao', async (req, res) => {
             }
         }
     } catch (error) {
-        console.error('Erro ao salvar/atualizar a avaliação:', error);
+        console.error('Erro ao salvar/atualizar a avaliação no banco de dados:', error);
         res.status(500).json({ message: 'Erro interno no servidor ao salvar/atualizar a avaliação' });
     }
 });
-
-
-
-
-app.get('/api/jogos', async (req, res) => {
-    try {
-        const searchTerm = req.query.name ? req.query.name.toLowerCase() : null;
-        const category = req.query.category || null;
-
-        const connection = await createConnection();
-
-        // Log para verificar as consultas SQL geradas
-        console.log('Generated SQL for searchTerm:', searchTerm);
-        console.log('Generated SQL for category:', category);
-
-        // Se houver um termo de pesquisa, realizar uma consulta filtrada
-        if (searchTerm) {
-            let query = 'SELECT * FROM games WHERE LOWER(name) LIKE ?';
-            const params = [`%${searchTerm}%`];
-
-            // Adicione a condição da categoria se fornecida
-            if (category) {
-                query += ' AND FIND_IN_SET(?, categories) > 0';
-                params.push(category);
-            }
-
-            const [rows, fields] = await connection.execute(query, params);
-            console.log('Result for searchTerm:', rows);
-            res.json(rows);
-        } else {
-            // Caso contrário, obter todos os jogos ou jogos por categoria
-            let query = 'SELECT * FROM games';
-            const params = [];
-
-            // Adicione a condição da categoria se fornecida
-            if (category) {
-                query += ' WHERE FIND_IN_SET(?, categories) > 0';
-                params.push(category);
-            }
-
-            const [rows, fields] = await connection.execute(query, params);
-            console.log('Result for category:', rows);
-            res.json(rows);
-        }
-
-        await connection.end();
-    } catch (error) {
-        console.error('Erro ao buscar dados do banco de dados:', error);
-        res.status(500).send('Erro interno do servidor');
-    }
-});
-
-
 
 
 // Rota para salvar usuário host

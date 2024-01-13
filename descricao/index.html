@@ -3,6 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+    
     <style>
         body {
             display: flex;
@@ -20,7 +24,9 @@
         }
 
         .body {
-  font-family: Arial, sans-serif;
+            font-family: "Kanit", sans-serif;
+  font-weight: 200;
+  font-style: normal;
   margin-right: 7%;
   margin-left: 7%;
 
@@ -115,6 +121,9 @@ padding: 20px;
 text-align: center;
 border-top: 1px solid white; /* Linha branca separando do conteúdo principal */
 margin-top: 40px; /* Faz o footer ficar no final da página */
+font-family: "Kanit", sans-serif;
+  font-weight: 200;
+  font-style: normal;
 }
 
 #nomeJogo{
@@ -179,6 +188,77 @@ margin-top: 40px; /* Faz o footer ficar no final da página */
     grid-area: 1fr;
   }
 
+  .imgjogo{
+height: 300px; /* Isso garante que a altura seja ajustada automaticamente, mantendo a proporção da imagem */
+
+}
+
+.imgdesc {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+#descricaoJogo{
+    text-align: center;
+}
+
+  /*responsividade*/
+@media screen and (max-width: 500px) {
+.body {
+  margin-right: 2%;
+  margin-left: 2%;
+
+}
+.slides {
+height: 100px;
+}
+
+.categorias {
+font-size: 10px;
+}
+
+.rectangles-container {
+display: block;
+}
+
+.left-section, .right-section {
+font-size: 10px;
+}
+.shop{
+font-size: 10px;
+}
+.conta{
+font-size: 10px;
+}
+h1{
+display: none;
+}
+div.icon {
+margin-right: 5px;
+}
+img.icon{
+height: 30px;
+width: 30px;
+}
+.jogos{
+grid-template-columns: 1fr 1fr;
+}
+
+.imgjogo{
+height: 200px; /* Isso garante que a altura seja ajustada automaticamente, mantendo a proporção da imagem */
+}
+h1#nomeJogo{
+    display: block;
+}
+.imgdesc {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+}
     </style>
     <title>Gamedan</title>
 </head>
@@ -190,33 +270,31 @@ margin-top: 40px; /* Faz o footer ficar no final da página */
             <img class="icon" src="https://i.postimg.cc/W3C9Z5bC/logo.jpg" alt="conta">
 
           </div>
-          <h1 style="color: white; font-size: 24px; cursor: pointer;" onclick="voltar()">Gamedan</h1>
+          <h1 style="color: white;">Gamedan</h1>
         </div>
         <div class="right-section">
             <div class="shop" style="height: 40px;" onclick="shop()">
                 <div class="icon">
-                    <img class="icon" src="https://i.postimg.cc/QCLr7D8C/vista-lateral-vazia-do-carrinho-de-compras-2.png" alt="shop" >
+                    <img class="icon" src="https://i.postimg.cc/QCLr7D8C/vista-lateral-vazia-do-carrinho-de-compras-2.png" alt="shop">
                 </div>
                 <h1 style="color: white;"> Shop</h1>
             </div>
             
-            <div class="contabotao">
-                <div class="conta" style="height: 40px;" onclick="conta()">
-                    <div class="icon">
-                        <img class="icon" src="https://i.postimg.cc/XYLYdrBP/do-utilizador.png" alt="conta">
-                    </div>
-                    <h1 style="color: white;"> Conta</h1>
+            <div class="conta" style="height: 40px;" onclick="conta()">
+                <div class="icon">
+                    <img class="icon" src="https://i.postimg.cc/XYLYdrBP/do-utilizador.png" alt="conta">
                 </div>
+                <h1 style="color: white;"> Conta</h1>
             </div>
-
+           
         </div>
-    </header>
+      </header>
     
     <section>
         <div class="descricao-container">
             <h1 id="nomeJogo" style="color: white;"></h1>
                 <div class="imgdesc" >
-                    <img id="imgJogo" class="imgjogo" alt="Imagem do Jogo" style="width: 300px; height: 350px;">
+                    <img id="imgJogo" class="imgjogo" alt="Imagem do Jogo">
                     <strong id="price"></strong>
                     <div class="estrelas">
                         <img class="imgestrela"  src="https://i.postimg.cc/TYhQhV9g/estrela-2.png" alt="">

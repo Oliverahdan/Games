@@ -138,6 +138,39 @@ app.get('/compras', async (req, res) => {
     }
 });
 
+app.delete('/excluir-compra/:game/:user', async (req, res) => {
+    const gameID = req.params.game;
+    const userID = req.params.user;
+
+    console.log('UserID:', userID);
+    console.log('GameID:', gameID);
+    try {
+        // Buscar detalhes do jogo associado à compra
+        const [gameDetails] = await req.locals.connection.execute('SELECT * FROM games WHERE id = ?', [gameID]);
+
+        if (gameDetails.length === 0) {
+            res.status(404).json({ message: 'Detalhes do jogo não encontrados' });
+            return;
+        }
+
+        // Agora você pode usar os detalhes do jogo conforme necessário
+
+        // Exemplo: excluindo a compra associada ao usuário e jogo
+        const [deleteResults] = await req.locals.connection.execute('DELETE FROM shop WHERE user = ? AND game = ?', [userID, gameID]);
+
+        if (deleteResults.affectedRows === 0) {
+            res.status(404).json({ message: 'Compra não encontrada para exclusão' });
+        } else {
+            res.json({ message: 'Compra excluída com sucesso', game: gameDetails[0] });
+        }
+    } catch (error) {
+        console.error('Erro ao excluir a compra:', error);
+        res.status(500).json({ message: 'Erro interno no servidor ao excluir a compra' });
+    }
+});
+
+
+
 
 app.get('/api/jogos', async (req, res) => {
     try {

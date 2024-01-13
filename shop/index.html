@@ -3,6 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+
     <style>
         body {
             display: flex;
@@ -20,7 +24,9 @@
         }
 
         .body {
-  font-family: Arial, sans-serif;
+            font-family: "Kanit", sans-serif;
+  font-weight: 200;
+  font-style: normal;
   margin-right: 7%;
   margin-left: 7%;
 
@@ -74,6 +80,7 @@ div.icon {
 img.icon{
   height: 35px;
   width: 35px;
+  border-radius: 50px ;
 }
 
 .shop:hover, .conta:hover {
@@ -112,6 +119,9 @@ padding: 20px;
 text-align: center;
 border-top: 1px solid white; /* Linha branca separando do conteúdo principal */
 margin-top: 40px; /* Faz o footer ficar no final da página */
+font-family: "Kanit", sans-serif;
+  font-weight: 200;
+  font-style: normal;
 }
 
 #nomeJogo{
@@ -135,6 +145,34 @@ margin-top: 40px; /* Faz o footer ficar no final da página */
             padding: 8px 12px;
             cursor: pointer;
         }
+
+        .compra {
+            display: flex;
+            align-items: center;
+            width: calc(86% - 14%); /* 86% - 7% de margem à esquerda e 7% de margem à direita */
+            height: 60px;
+            margin: 10px 7%;
+            background-color: #2C3E50; /* Cor de fundo do retângulo de compra */
+            padding: 5px;
+            border-radius: 5px;
+            color: white;
+        }
+
+        .compra img {
+            width: 50px;
+            height: 50px;
+            margin-right: 10px;
+            border-radius: 5px;
+        }
+
+        .compra p {
+            margin: 0 10px; /* Adicionado espaçamento entre as informações */
+        }
+
+        .compra .excluir {
+            margin-left: auto;
+            cursor: pointer;
+        }
     </style>
     <title>Gamedan</title>
 </head>
@@ -143,13 +181,13 @@ margin-top: 40px; /* Faz o footer ficar no final da página */
     <header>
         <div class="left-section">
           <div class="icon">
-            <img class="icon" src="https://i.postimg.cc/XYLYdrBP/do-utilizador.png" alt="conta">
+            <img class="icon" src="https://i.postimg.cc/W3C9Z5bC/logo.jpg" alt="conta">
 
           </div>
-          <h1 style="color: white; font-size: 24px; cursor: pointer;" onclick="voltar()">Gamedan</h1>
+          <h1 style="color: white; cursor: pointer;" onclick="voltar()" >Gamedan</h1>
         </div>
         <div class="right-section">
-            <div class="shop" style="height: 40px;">
+            <div class="shop" style="height: 40px;" onclick="shop()">
                 <div class="icon">
                     <img class="icon" src="https://i.postimg.cc/QCLr7D8C/vista-lateral-vazia-do-carrinho-de-compras-2.png" alt="shop">
                 </div>
@@ -162,9 +200,11 @@ margin-top: 40px; /* Faz o footer ficar no final da página */
                 </div>
                 <h1 style="color: white;"> Conta</h1>
             </div>
-
+           
         </div>
-    </header>
+      </header>
+
+      <div id="mensagemSemCompras" style="text-align: center; font-size: 18px; margin-top: 50px; color: white;"></div>
     
     <section id="comprasSection" style="color: white;">
         <!-- Aqui serão exibidas as compras -->
@@ -183,35 +223,88 @@ margin-top: 40px; /* Faz o footer ficar no final da página */
     }
     function voltar(){
             window.location.href = './jogos';
-        }
-   document.addEventListener('DOMContentLoaded', function () {
-    const section = document.querySelector('section');
+    }
 
-    // Fazer uma solicitação AJAX para obter as compras
-    fetch('/compras')
-        .then(response => response.json())
-        .then(compras => {
-            // Limpar a seção
-            section.innerHTML = '';
+    function excluirCompra(game, user) {
+    console.log('gameId:', game);
+    console.log('userId:', user);
+    // Verificar se o gameId e userId são válidos
+    if (!game || !user) {
+        alert('ID do jogo ou do usuário inválido. Tente novamente.');
+        return;
+    }
 
-            // Iterar sobre as compras e adicionar à seção
-            compras.forEach(compra => {
-                const compraElement = document.createElement('div');
-                compraElement.classList.add('compra');
+    const confirmacao = confirm('Tem certeza que deseja excluir esta compra?');
 
-                // Adicionar a imagem, o nome e o preço à div de compra
-                compraElement.innerHTML = `
-                    <img src="${compra.image}" alt="${compra.name}" style="width: 50px; height: 50px; margin-right: 5px;">
-                    <p>Name: ${compra.name}</p>
-                    <p>Price: ${compra.price}</p>
-                `;
-
-                section.appendChild(compraElement);
-            });
+    if (confirmacao) {
+        // Fazer uma solicitação AJAX para excluir a compra no servidor
+        fetch(`/excluir-compra/${game}/${user}`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+            },
         })
-        .catch(error => console.error('Erro ao buscar compras:', error));
-});
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`Erro ao excluir a compra: ${response.statusText}`);
+                }
+                // Recarregar a lista de compras após a exclusão
+                carregarCompras();
+            })
+            .catch(error => {
+                console.error(error);
+                alert('Erro ao excluir a compra. Tente novamente.');
+            });
+    }
+}
 
+
+
+
+
+    // Função para carregar as compras
+    function carregarCompras() {
+        const section = document.querySelector('#comprasSection');
+        const mensagemSemCompras = document.querySelector('#mensagemSemCompras');
+
+        // Fazer uma solicitação AJAX para obter as compras
+        fetch('/compras')
+            .then(response => {
+                if (response.status === 401) {
+                    throw new Error('Você não está autenticado.');
+                }
+                return response.json();
+            })
+            .then(compras => {
+                section.innerHTML = '';
+
+                if (compras.length === 0) {
+                    mensagemSemCompras.textContent = 'Você não tem compras.';
+                } else {
+                    compras.forEach(compra => {
+                        const compraElement = document.createElement('div');
+                        compraElement.classList.add('compra');
+
+                        compraElement.innerHTML = `
+                            <img src="${compra.image}" alt="${compra.name}" style="width: 50px; height: 50px; margin-right: 10px; border-radius: 5px;">
+                            <p>${compra.name}</p>
+                            <p>${compra.price}</p>
+                            <p style="display: block;">${compra.game}</p>
+                            <img src="https://i.postimg.cc/RCb8QZ0h/lixeira-de-reciclagem.png" alt="Excluir" class="excluir" onclick="excluirCompra('${compra.game}', '${compra.user}')">
+                        `;
+
+                        section.appendChild(compraElement);
+                    });
+                }
+            })
+            .catch(error => {
+                mensagemSemCompras.textContent = 'Erro na solicitação: ' + error.message;
+            });
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        carregarCompras();
+    });
 </script>
 
     

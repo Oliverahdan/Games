@@ -169,6 +169,47 @@ app.delete('/excluir-compra/:game/:user', async (req, res) => {
     }
 });
 
+// Rota para salvar avaliação
+app.post('/salvar-avaliacao', async (req, res) => {
+    const gameId = req.body.gameId;
+    const userId = req.body.userId;
+    const qtEstrelas = req.body.qtEstrelas;
+
+    const userCookie = req.cookies.userId;
+
+    if (!userCookie || userCookie !== userId) {
+        return res.status(401).json({ message: 'Usuário não autenticado' });
+    }
+
+    try {
+        // Verificar se o usuário já avaliou o jogo
+        const [existingRating] = await req.locals.connection.execute('SELECT * FROM stars WHERE game = ? AND user = ?', [gameId, userId]);
+
+        if (existingRating.length > 0) {
+            // O usuário já avaliou o jogo; atualizar a avaliação existente
+            const [updateResults] = await req.locals.connection.execute('UPDATE stars SET qt = ? WHERE game = ? AND user = ?', [qtEstrelas, gameId, userId]);
+
+            if (updateResults.affectedRows === 0) {
+                res.status(500).json({ message: 'Erro ao atualizar a avaliação' });
+            } else {
+                res.json({ message: 'Avaliação atualizada com sucesso' });
+            }
+        } else {
+            // O usuário ainda não avaliou o jogo; inserir uma nova avaliação
+            const [insertResults] = await req.locals.connection.execute('INSERT INTO stars (qt, game, user) VALUES (?, ?, ?)', [qtEstrelas, gameId, userId]);
+
+            if (insertResults.affectedRows === 0) {
+                res.status(500).json({ message: 'Erro ao salvar a avaliação' });
+            } else {
+                res.json({ message: 'Avaliação salva com sucesso' });
+            }
+        }
+    } catch (error) {
+        console.error('Erro ao salvar/atualizar a avaliação:', error);
+        res.status(500).json({ message: 'Erro interno no servidor ao salvar/atualizar a avaliação' });
+    }
+});
+
 
 
 

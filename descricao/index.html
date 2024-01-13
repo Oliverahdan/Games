@@ -302,6 +302,7 @@ h1#nomeJogo{
                         <img class="imgestrela" src="https://i.postimg.cc/TYhQhV9g/estrela-2.png" alt="">
                         <img class="imgestrela"  src="https://i.postimg.cc/TYhQhV9g/estrela-2.png" alt="">
                         <img class="imgestrela"  src="https://i.postimg.cc/TYhQhV9g/estrela-2.png" alt="">
+                        <button id="avaliarBtn" class="b" style="width: 200px; height: 80px; border-radius: 20px; font-size: large; cursor: pointer;" onclick="avaliarJogo()">Avaliar</button>
                     </div>
                     <button class="b" style="width: 200px; height: 80px; border-radius: 20px; font-size: large; cursor: pointer;" onclick="comprarJogo()">comprar</button>
                 </div>
@@ -330,6 +331,69 @@ h1#nomeJogo{
 
 <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
 <script>
+function avaliarJogo() {
+    // Exibir a janela pop-up
+    const avaliar = confirm('Você gostaria de avaliar o jogo?');
+
+    if (avaliar) {
+        // O usuário escolheu avaliar, então obtenha a quantidade de estrelas
+        const qtEstrelas = obterQuantidadeEstrelasSelecionadas();
+
+        // Salvar a avaliação no banco de dados
+        salvarAvaliacao(qtEstrelas);
+    }
+}
+
+function obterQuantidadeEstrelasSelecionadas() {
+    // Percorrer as estrelas e contar quantas estão selecionadas
+    let qtEstrelas = 0;
+    $('.imgestrela').each(function() {
+        if ($(this).attr('src') === 'https://i.postimg.cc/nLnLCTwR/estrela-1.png') {
+            qtEstrelas++;
+        }
+    });
+    return qtEstrelas;
+}
+
+function salvarAvaliacao(qtEstrelas) {
+    const gameId = obterIdDoJogo();  // Obtenha o ID do jogo
+    const userId = obterIdDoUsuario();  // Obtenha o ID do usuário
+
+    // Verificar se o usuário está autenticado
+    if (!userId) {
+        // Se não estiver autenticado, redirecionar para a página de login
+        alert('Faça login para avaliar o jogo.');
+        window.location.href = '/login';  // Substitua '/login' pela rota real da sua página de login
+        return;
+    }
+
+    // Enviar uma solicitação POST para a rota de salvar avaliação
+    fetch('/salvar-avaliacao', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ qtEstrelas, gameId, userId }),
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log(data.message);
+
+        // Exibir um alerta indicando que a avaliação foi salva com sucesso
+        alert('Avaliação salva com sucesso!');
+
+        // Implemente qualquer lógica adicional após a avaliação ser salva com sucesso, se necessário
+    })
+    .catch(error => {
+        console.error('Erro ao salvar a avaliação:', error);
+        // Implemente qualquer lógica adicional em caso de erro
+    });
+}
+
+
+
+
+
     function obterIdDoUsuario() {
     const cookiesString = document.cookie;
     const cookiesArray = cookiesString.split(';').map(cookie => cookie.trim());

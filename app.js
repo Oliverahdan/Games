@@ -230,6 +230,61 @@ app.post('/salvar-avaliacao', async (req, res) => {
     }
 });
 
+// Exemplo de definição da função obterIdDoUsuario
+function obterIdDoUsuario(req) {
+    // Lógica para obter o ID do usuário do cookie ou de onde quer que esteja armazenado
+    // Exemplo: suponha que o ID do usuário esteja armazenado no cookie 'userId'
+    const cookiesString = req.headers.cookie || '';
+    const cookiesArray = cookiesString.split(';').map(cookie => cookie.trim());
+
+    for (const cookie of cookiesArray) {
+        const [cookieName, cookieValue] = cookie.split('=');
+
+        if (cookieName === 'userId') {
+            return cookieValue;
+        }
+    }
+
+    return null; // Retorna null se o ID do usuário não for encontrado
+}
+
+// Restante do seu código
+app.post('/salvar-comentario', async (req, res) => {
+    const comment = req.body.comment;
+    const gameId = req.body.gameId;
+
+    try {
+        const userId = obterIdDoUsuario(req);
+
+        if (!userId) {
+            return res.status(401).json({ message: 'Usuário não autenticado' });
+        }
+
+        if (!gameId) {
+            return res.status(400).json({ message: 'ID do jogo não fornecido' });
+        }
+
+
+        // Agora você tem o comment, gameId e userId, pode prosseguir com a lógica de salvar no banco de dados
+        // Substitua o trecho a seguir com a lógica específica do seu banco de dados
+
+        const [insertResults] = await req.locals.connection.execute(
+            'INSERT INTO comments (comment, user, game) VALUES (?, ?, ?)',
+            [comment, userId, gameId]
+        );
+
+        if (insertResults.affectedRows === 0) {
+            return res.status(500).json({ message: 'Erro ao salvar o comentário' });
+        }
+
+        res.json({ message: 'Comentário salvo com sucesso' });
+
+    } catch (error) {
+        console.error('Erro ao salvar o comentário:', error);
+        res.status(500).json({ message: 'Erro interno no servidor ao salvar o comentário' });
+    }
+});
+
 
 // Rota para salvar usuário host
 app.post('/api/userhost', async (req, res) => {

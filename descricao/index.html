@@ -203,7 +203,24 @@ height: 300px; /* Isso garante que a altura seja ajustada automaticamente, mante
 #descricaoJogo{
     text-align: center;
 }
+#avaliarBtn{
+    height: 50px;
+        width: 120px;
+        border-radius: 50px;
+        font-size: x-large;
+        background-color: #3B82F6;
+        color: white;
+        margin-left: 10px;
+    }
 
+    .b{
+        height: 80px;
+        width: 200px;
+        border-radius: 50px;
+        font-size: x-large;
+        background-color: #3B82F6;
+        color: white;
+    }
   /*responsividade*/
 @media screen and (max-width: 500px) {
 .body {
@@ -302,27 +319,22 @@ h1#nomeJogo{
                         <img class="imgestrela" src="https://i.postimg.cc/TYhQhV9g/estrela-2.png" alt="">
                         <img class="imgestrela"  src="https://i.postimg.cc/TYhQhV9g/estrela-2.png" alt="">
                         <img class="imgestrela"  src="https://i.postimg.cc/TYhQhV9g/estrela-2.png" alt="">
-                        <button id="avaliarBtn" class="b" style="width: 200px; height: 80px; border-radius: 20px; font-size: large; cursor: pointer;" onclick="avaliarJogo()">Avaliar</button>
+                        <button id="avaliarBtn" onclick="avaliarJogo()">Avaliar</button>
                     </div>
-                    <button class="b" style="width: 200px; height: 80px; border-radius: 20px; font-size: large; cursor: pointer;" onclick="comprarJogo()">comprar</button>
+                    <button class="b" onclick="comprarJogo()">comprar</button>
                 </div>
             <p id="descricaoJogo" style="color: white; margin-top: 50px;"></p>
             <!-- Adicione mais informações do jogo conforme necessário -->
         </div>
     </section>
 
-  <section class="comentario" style="margin-top: 300px;">
-    <h2 style="color: white;">Comentários</h2>
-
-    <form id="commentForm">
+    <form id="commentForm" action="/salvar-comentario" method="POST">
+        <input type="hidden" id="gameId" name="gameId" value="colocar_valor_do_id_aqui">
         <input type="text" id="commentInput" name="comment" placeholder="Digite seu comentário..." required>
-
         <button type="submit" id="submitBtn">Enviar</button>
     </form>
-  </section>
-
-
-
+    
+    
 </div>
 <footer class="footer">
     <img src="https://i.postimg.cc/FzBrkz8f/circulo-c-1.png" alt="fim" style="width: 15px; height: 15px; margin-right: 5px;">
@@ -331,6 +343,15 @@ h1#nomeJogo{
 
 <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
 <script>
+
+function obterIdDoJogo() {
+        // Implemente a lógica para obter o ID do jogo, por exemplo, através da URL
+        // Retorne o ID do jogo
+        const params = new URLSearchParams(window.location.search);
+        return params.get('id');  // Substitua com a lógica real de obtenção do ID do jogo
+    }
+
+
     
     function obterIdDoUsuario() {
     const cookiesString = document.cookie;
@@ -429,9 +450,10 @@ h1#nomeJogo{
                 const jogo = data.find(j => j.id == gameId); // Encontra o jogo com o ID correspondente
 
                 if (jogo) {
-                    document.getElementById('nomeJogo').innerText = jogo.name;
-                    document.getElementById('imgJogo').src = jogo.image;
-                    document.getElementById('descricaoJogo').innerText = jogo.description;
+                document.getElementById('nomeJogo').innerText = jogo.name;
+                document.getElementById('imgJogo').src = jogo.image;
+                document.getElementById('descricaoJogo').innerText = jogo.description;
+                document.getElementById('gameId').value = jogo.id; // Preencha o campo gameId
 
                     // Formatando o preço com "R$" na frente e substituindo "." por ","
                     const formattedPrice = `R$ ${jogo.price.replace('.', ',')}`;

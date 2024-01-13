@@ -484,6 +484,45 @@ function preencherEstrelas(qtEstrelas) {
     });
 }
 
+function avaliarJogo() {
+        // Coloque aqui o código para lidar com a avaliação do jogo
+        const gameId = obterIdDoJogo();  // Chame a função para obter o ID do jogo
+        const userId = obterIdDoUsuario();  // Implemente a lógica para obter o ID do usuário
+
+        // Verificar se o usuário está autenticado
+        if (!userId) {
+            // Se não estiver autenticado, redirecionar para a página de login
+            alert('Faça login para avaliar o jogo.');
+            window.location.href = '/login';  // Substitua '/login' pela rota real da sua página de login
+            return;
+        }
+
+        // Obtenha a quantidade de estrelas selecionadas pelo usuário
+        const qtEstrelas = $('.imgestrela[src$="estrela-1.png"]').length;
+
+        // Enviar uma solicitação POST para a rota de salvar-avaliacao
+        fetch('/salvar-avaliacao', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ gameId, userId, qtEstrelas }),
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log(data.message);
+
+            // Exibir um alerta indicando que a avaliação foi bem-sucedida
+            alert('Avaliação realizada com sucesso!');
+
+            // Implemente qualquer lógica adicional após a avaliação bem-sucedida, se necessário
+        })
+        .catch(error => {
+            console.error('Erro ao avaliar o jogo:', error);
+            // Implemente qualquer lógica adicional em caso de erro
+        });
+    }
+
 
 function exibirEstrelasUsuario(qtEstrelas) {
     const selectedImage = 'https://i.postimg.cc/nLnLCTwR/estrela-1.png';

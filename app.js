@@ -248,6 +248,64 @@ function obterIdDoUsuario(req) {
     return null; // Retorna null se o ID do usuário não for encontrado
 }
 
+app.get('/api/comentarios', async (req, res) => {
+    try {
+        const gameId = req.query.gameId;
+
+        if (!gameId) {
+            return res.status(400).json({ message: 'ID do jogo não fornecido' });
+        }
+
+        const [comentariosResults] = await req.locals.connection.execute(
+            'SELECT comments.id, comments.comment, comments.game, comments.user, users.name AS userName ' +
+            'FROM comments ' +
+            'INNER JOIN users ON comments.user = users.id ' +
+            'WHERE comments.game = ?',
+            [gameId]
+        );
+
+        res.json(comentariosResults);
+    } catch (error) {
+        console.error('Erro ao buscar comentários:', error);
+        res.status(500).json({ message: 'Erro interno no servidor ao buscar comentários' });
+    }
+});
+
+// Rota para excluir comentário
+app.delete('/excluir-comentario/:commentId', async (req, res) => {
+    const commentId = req.params.commentId;
+
+    try {
+        // Verificar se o comentário existe
+        const [comment] = await req.locals.connection.execute('SELECT * FROM comments WHERE id = ?', [commentId]);
+
+        if (comment.length === 0) {
+            res.status(404).json({ message: 'Comentário não encontrado' });
+            return;
+        }
+
+        // Verificar se o usuário autenticado é o autor do comentário
+        const userId = obterIdDoUsuario(req);
+        if (userId !== comment[0].user.toString()) {
+            res.status(403).json({ message: 'Você não tem permissão para excluir este comentário' });
+            return;
+        }
+
+        // Excluir o comentário
+        const [deleteResults] = await req.locals.connection.execute('DELETE FROM comments WHERE id = ?', [commentId]);
+
+        if (deleteResults.affectedRows === 0) {
+            res.status(500).json({ message: 'Erro ao excluir o comentário' });
+        } else {
+            res.json({ message: 'Comentário excluído com sucesso' });
+        }
+    } catch (error) {
+        console.error('Erro ao excluir o comentário:', error);
+        res.status(500).json({ message: 'Erro interno no servidor ao excluir o comentário' });
+    }
+});
+
+
 // Restante do seu código
 app.post('/salvar-comentario', async (req, res) => {
     const comment = req.body.comment;

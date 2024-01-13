@@ -276,7 +276,31 @@ h1#nomeJogo{
     text-align: center;
 }
 }
-    </style>
+
+.comentarios {
+        border: 1px solid #ccc;
+        padding: 10px;
+        margin: 10px;
+        border-radius: 8px;
+    }
+
+    /* Estilo para cada comentário (retângulo menor) */
+    .comentario {
+    display: flex;
+    margin: 20px;
+    border: 1px solid #ccc;
+    max-width: 100%; /* Defina o valor desejado para a largura máxima */
+    word-wrap: break-word; /* Garante que as palavras que não cabem na largura sejam quebradas */
+    max-height: auto; /* ou defina um valor mínimo desejado */
+}
+.lixeira{
+    margin-left: auto;
+    cursor: pointer;
+    width: 40px;
+    height: 40px;
+}
+
+</style>
     <title>Gamedan</title>
 </head>
 <body>
@@ -328,11 +352,19 @@ h1#nomeJogo{
         </div>
     </section>
 
-    <form id="commentForm" action="/salvar-comentario" method="POST">
-        <input type="hidden" id="gameId" name="gameId" value="colocar_valor_do_id_aqui">
-        <input type="text" id="commentInput" name="comment" placeholder="Digite seu comentário..." required>
-        <button type="submit" id="submitBtn">Enviar</button>
-    </form>
+            <div class="comentarios">
+
+                <!-- Adicione uma div para exibir os comentários -->
+            <div id="comentariosContainer">
+                <!-- Comentários serão exibidos aqui -->
+            </div>
+
+            <form id="commentForm" action="/salvar-comentario" method="POST">
+                <input type="hidden" id="gameId" name="gameId" value="colocar_valor_do_id_aqui">
+                <input type="text" id="commentInput" name="comment" placeholder="Digite seu comentário..." required>
+                <button type="submit" id="submitBtn">Enviar</button>
+            </form>
+        </div>
     
     
 </div>
@@ -343,6 +375,174 @@ h1#nomeJogo{
 
 <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
 <script>
+
+document.addEventListener('DOMContentLoaded', function () {
+        // Função para obter o ID do usuário
+        function obterIdDoUsuario() {
+            const cookiesString = document.cookie;
+            const cookiesArray = cookiesString.split(';').map(cookie => cookie.trim());
+
+            for (const cookie of cookiesArray) {
+                const [cookieName, cookieValue] = cookie.split('=');
+
+                if (cookieName === 'userId') {
+                    return cookieValue;
+                }
+            }
+
+            return null;
+        }
+
+        // Função para mostrar ou ocultar a lixeira com base no usuário logado
+        function atualizarEstiloLixeira() {
+        const userId = obterIdDoUsuario();
+        const lixeiras = document.querySelectorAll(`.comentario[data-userid="${userId}"] .lixeira`);
+
+        lixeiras.forEach(lixeira => {
+            lixeira.style.display = userId ? 'inline-block' : 'none';
+        });
+    }
+
+        // Chame a função ao carregar a página e ao detectar mudanças de estado
+        document.addEventListener('DOMContentLoaded', function () {
+            atualizarEstiloLixeira();
+        });
+
+        window.addEventListener('popstate', function () {
+            atualizarEstiloLixeira();
+        });
+    });
+
+
+    function obterIdDoUsuario() {
+    // Recupera o cookie com o nome 'userId'
+    const userIdCookie = document.cookie.split(';').find(cookie => cookie.trim().startsWith('userId='));
+
+    if (userIdCookie) {
+        // Extrai e retorna o valor do cookie
+        return userIdCookie.split('=')[1];
+    } else {
+        // Se o cookie não for encontrado, retorna null ou outro valor padrão
+        return null;
+    }
+}
+
+function excluirComentario(id) {
+    if (!id) {
+        console.error('ID do comentário inválido.');
+        return;
+    }
+
+    console.log(`.comentario[data-id="${id}"]`);
+    const comentarioElement = document.querySelector(`.comentario[data-id="${id}"]`);
+    console.log(comentarioElement);
+
+    if (!comentarioElement) {
+        console.error('Elemento do comentário não encontrado.');
+        return;
+    }
+
+    // Verifica se o comentário pertence ao usuário logado
+    const userId = obterIdDoUsuario();
+    const comentarioUserId = comentarioElement.dataset.userid;
+
+    if (userId === comentarioUserId) {
+        // Confirmação para excluir o comentário
+        const confirmacao = confirm('Tem certeza que deseja excluir este comentário?');
+
+        if (confirmacao) {
+            // Enviar uma solicitação DELETE para a rota de excluir-comentario
+            fetch(`/excluir-comentario/${id}`, {
+                method: 'DELETE',
+            })
+                .then(response => response.json())
+                .then(data => {
+                    console.log(data.message);
+
+                    // Exibir um alerta indicando que o comentário foi excluído com sucesso
+                    alert('Comentário excluído com sucesso!');
+
+                    // Recarrega os comentários após a exclusão
+                    carregarComentarios();
+                })
+                .catch(error => {
+                    console.error('Erro ao excluir o comentário:', error);
+                    // Implemente qualquer lógica adicional em caso de erro
+                });
+        }
+    } else {
+        // Se o comentário não pertence ao usuário logado, exibe uma mensagem ou faz outra ação necessária
+        alert('Você só pode excluir seus próprios comentários.');
+    }
+}
+
+
+
+
+     // Carrega os comentários quando a página é carregada
+     $(document).ready(function () {
+        carregarInformacoesJogo();
+        carregarComentarios();
+    });
+
+    // Chame a função ao detectar mudanças de estado
+    window.addEventListener('popstate', function() {
+        carregarInformacoesJogo();
+        carregarComentarios();
+    });
+
+    // Função para carregar e exibir comentários
+async function carregarComentarios() {
+    try {
+        const gameId = obterIdDoJogo(); // Chame a função para obter o ID do jogo
+
+        // Faz uma solicitação para obter os comentários associados ao jogo
+        const response = await fetch(`/api/comentarios?gameId=${gameId}`);
+        const comentarios = await response.json();
+
+        // Limpa a div de comentários antes de adicionar os novos
+        $('#comentariosContainer').empty();
+
+        // Adiciona os comentários à div
+        comentarios.forEach(comentario => {
+            const comentarioElement = `<div class="comentario" data-id="${comentario.id}" data-userid="${comentario.userId}">
+                <p style="margin-right: 10px;">${comentario.userName}:</p>
+                <p>${comentario.comment}</p>
+                <img src="https://i.postimg.cc/RCb8QZ0h/lixeira-de-reciclagem.png" class="lixeira" alt="Excluir" onclick="excluirComentario(${comentario.id})">
+            </div>`;
+            $('#comentariosContainer').append(comentarioElement);
+        });
+    } catch (error) {
+        console.error('Erro ao carregar comentários:', error);
+    }
+}
+
+// Adiciona um ouvinte de evento para o envio do formulário
+$('#commentForm').submit(function (event) {
+    event.preventDefault();  // Impede o envio padrão do formulário
+
+    // Realiza o envio do formulário usando AJAX
+    $.ajax({
+        type: 'POST',
+        url: '/salvar-comentario',
+        data: $('#commentForm').serialize(),
+        success: function (data) {
+            // Se o comentário for salvo com sucesso, recarrega os comentários
+            carregarComentarios();
+            // Limpa o campo de comentário após o envio
+            $('#commentInput').val('');
+        },
+        error: function (error) {
+            console.error('Erro ao salvar comentário:', error);
+        }
+    });
+});
+
+// Carrega os comentários quando a página é carregada
+$(document).ready(function () {
+    carregarComentarios();
+});
+
 
 function obterIdDoJogo() {
         // Implemente a lógica para obter o ID do jogo, por exemplo, através da URL

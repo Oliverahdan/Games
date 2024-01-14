@@ -189,6 +189,52 @@ app.get('/api/estrelas', async (req, res) => {
     }
 });
 
+app.get('/api/media-estrelas', async (req, res) => {
+    const gameId = parseInt(req.query.gameId);
+
+    try {
+        const [ratingResults] = await req.locals.connection.execute('SELECT qt FROM stars WHERE game = ?', [gameId]);
+
+        if (ratingResults.length > 0) {
+            // Calcular a média das avaliações
+            const totalAvaliacoes = ratingResults.length;
+            const somaAvaliacoes = ratingResults.reduce((soma, resultado) => soma + resultado.qt, 0);
+            const mediaAvaliacoes = somaAvaliacoes / totalAvaliacoes;
+
+            res.json({ media: mediaAvaliacoes });
+        } else {
+            res.status(404).json({ error: 'Avaliações não encontradas' });
+        }
+    } catch (error) {
+        console.error('Erro ao obter avaliações do banco de dados:', error);
+        res.status(500).json({ message: 'Erro interno no servidor' });
+    }
+});
+
+// Nova rota para calcular a média de todas as avaliações para um jogo específico
+app.get('/api/media-estrelas-geral', async (req, res) => {
+    const gameId = parseInt(req.query.gameId);
+
+    try {
+        const [ratingResults] = await req.locals.connection.execute('SELECT qt FROM stars WHERE game = ?', [gameId]);
+
+        if (ratingResults.length > 0) {
+            // Calcular a média de todas as avaliações
+            const somaTotal = ratingResults.reduce((soma, resultado) => soma + resultado.qt, 0);
+            const mediaGeral = somaTotal / ratingResults.length;
+
+            res.json({ media: mediaGeral });
+        } else {
+            res.status(404).json({ error: 'Avaliações não encontradas' });
+        }
+    } catch (error) {
+        console.error('Erro ao obter avaliações do banco de dados:', error);
+        res.status(500).json({ message: 'Erro interno no servidor' });
+    }
+});
+
+
+
 
 /// Rota para salvar avaliação
 app.post('/salvar-avaliacao', async (req, res) => {

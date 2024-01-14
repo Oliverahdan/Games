@@ -314,7 +314,7 @@ h1#nomeJogo{
             <img class="icon" src="https://i.postimg.cc/W3C9Z5bC/logo.jpg" alt="conta">
 
           </div>
-          <h1 style="color: white;">Gamedan</h1>
+          <h1 style="color: white; cursor: pointer;" onclick="voltar()" >Gamedan</h1>
         </div>
         <div class="right-section">
             <div class="shop" style="height: 40px;" onclick="shop()">
@@ -339,6 +339,7 @@ h1#nomeJogo{
             <h1 id="nomeJogo" style="color: white;"></h1>
                 <div class="imgdesc" >
                     <img id="imgJogo" class="imgjogo" alt="Imagem do Jogo">
+                    <span id="mediaEstrelas" style="color: white;"></span>
                     <strong id="price"></strong>
                     <div class="estrelas">
                         <img class="imgestrela"  src="https://i.postimg.cc/TYhQhV9g/estrela-2.png" alt="">
@@ -627,7 +628,22 @@ function obterIdDoJogo() {
     function voltar(){
             window.location.href = './jogos';
         }
-        async function carregarInformacoesJogo() {
+
+
+        function exibirMediaEstrelas(mediaEstrelas) {
+    const spanMediaEstrelas = document.getElementById('mediaEstrelas');
+
+    // Verifica se o elemento spanMediaEstrelas existe antes de tentar manipulá-lo
+    if (spanMediaEstrelas) {
+        // Atualiza o conteúdo do elemento com a média de estrelas
+        spanMediaEstrelas.innerText = `Média de Estrelas: ${mediaEstrelas.toFixed(2)}`;
+    } else {
+        console.error('Elemento de exibição da média de estrelas não encontrado');
+    }
+}
+
+
+async function carregarInformacoesJogo() {
     console.log('Função carregarInformacoesJogo chamada');
 
     const params = new URLSearchParams(window.location.search);
@@ -640,7 +656,7 @@ function obterIdDoJogo() {
         try {
             // Buscar informações do jogo no banco de dados
             const response = await fetch(`/api/jogos?id=${gameId}&nocache=${noCache}`);
-            
+
             // Verificar se a resposta é bem-sucedida
             if (!response.ok) {
                 console.error(`Erro na requisição: ${response.status} - ${response.statusText}`);
@@ -656,10 +672,10 @@ function obterIdDoJogo() {
                 const jogo = data.find(j => j.id == gameId); // Encontra o jogo com o ID correspondente
 
                 if (jogo) {
-                document.getElementById('nomeJogo').innerText = jogo.name;
-                document.getElementById('imgJogo').src = jogo.image;
-                document.getElementById('descricaoJogo').innerText = jogo.description;
-                document.getElementById('gameId').value = jogo.id; // Preencha o campo gameId
+                    document.getElementById('nomeJogo').innerText = jogo.name;
+                    document.getElementById('imgJogo').src = jogo.image;
+                    document.getElementById('descricaoJogo').innerText = jogo.description;
+                    document.getElementById('gameId').value = jogo.id; // Preencha o campo gameId
 
                     // Formatando o preço com "R$" na frente e substituindo "." por ","
                     const formattedPrice = `R$ ${jogo.price.replace('.', ',')}`;
@@ -667,7 +683,7 @@ function obterIdDoJogo() {
 
                     // Buscar a quantidade de estrelas do banco de dados
                     const starsResponse = await fetch(`/api/estrelas?gameId=${gameId}&userId=${obterIdDoUsuario()}`);
-                    
+
                     // Verificar se a resposta é bem-sucedida
                     if (!starsResponse.ok) {
                         console.error(`Erro na requisição de estrelas: ${starsResponse.status} - ${starsResponse.statusText}`);
@@ -678,6 +694,10 @@ function obterIdDoJogo() {
 
                     // Preencher as estrelas com base na quantidade do banco de dados
                     preencherEstrelas(starsData.qt);
+
+                  // Calcular e exibir a média das estrelas
+                  const mediaEstrelasGeral = await calcularMediaEstrelasGeral(gameId);
+                  exibirMediaEstrelas(mediaEstrelasGeral)
 
                     // Preencha outras informações do jogo conforme necessário
                 } else {
@@ -693,6 +713,24 @@ function obterIdDoJogo() {
         console.error('ID do jogo não fornecido');
     }
 }
+
+async function calcularMediaEstrelasGeral(gameId) {
+    try {
+        const response = await fetch(`/api/media-estrelas-geral?gameId=${gameId}`);
+
+        if (!response.ok) {
+            console.error(`Erro na requisição de média geral de estrelas: ${response.status} - ${response.statusText}`);
+            return NaN;
+        }
+
+        const data = await response.json();
+        return data.media;
+    } catch (error) {
+        console.error('Erro ao calcular média geral de estrelas:', error);
+        return NaN;
+    }
+}
+
 
 
 function preencherEstrelas(qtEstrelas) {

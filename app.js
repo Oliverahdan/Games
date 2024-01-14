@@ -10,8 +10,9 @@ const port = 3000;
 const dbConfig = {
     host: 'monorail.proxy.rlwy.net',
     user: 'root',
-    password: '4g5e3gC34GfGdeHabge13EB3eFgceAFF',
-    database: 'gamedan'
+    password: '-6EGbBB1-hhEDDFGHFHaAFf15B3C5D23',
+    database: 'gamedan',
+    port: 11812
 };
 
 // Função para criar e retornar uma nova conexão

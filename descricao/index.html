@@ -95,7 +95,7 @@ img.icon{
 .estrelas{
     display: flex;
     margin-bottom: 10px;
-    margin-left: -100px;
+    margin-left: -10px;
 }
 
 .imgestrela{
@@ -153,22 +153,6 @@ font-family: "Kanit", sans-serif;
     color: white;
 }
 
-@media screen and (max-width: 2000px) {
-    .imgdesc {
-        grid-template-columns: 1fr;
-    }
-    .estrelas{
-    margin-left: 1px;
-    margin-top: 20px;
-}
-#price{
-    margin-left: 1px;
-    margin-top: 20px;
-}
-.b{
-    margin-top: 20px;
-}
-}
 
 .login {
   display: none;
@@ -220,6 +204,7 @@ height: 300px; /* Isso garante que a altura seja ajustada automaticamente, mante
         font-size: x-large;
         background-color: #3B82F6;
         color: white;
+        margin-top: 30px;
     }
   /*responsividade*/
 @media screen and (max-width: 500px) {
@@ -275,6 +260,19 @@ h1#nomeJogo{
     align-items: center;
     text-align: center;
 }
+
+.imgestrela {
+  height: 20px; /* Ajuste a altura desejada */
+  width: 20px; /* Ajuste a largura desejada */
+  margin-right: 5px; /* Adicione margem direita para espaçamento entre as estrelas */
+}
+
+#avaliarBtn {
+  font-size: 12px; /* Ajuste o tamanho da fonte do botão */
+  margin-left: 10px;
+  height: 20px; /* Adicione margem esquerda para espaçamento entre as estrelas e o botão */
+}
+
 }
 
 .comentarios {
@@ -287,17 +285,22 @@ h1#nomeJogo{
     /* Estilo para cada comentário (retângulo menor) */
     .comentario {
     display: flex;
-    margin: 20px;
     border: 1px solid #ccc;
     max-width: 100%; /* Defina o valor desejado para a largura máxima */
     word-wrap: break-word; /* Garante que as palavras que não cabem na largura sejam quebradas */
-    max-height: auto; /* ou defina um valor mínimo desejado */
+    height: 20px;
+    max-height: 100%; /* ou defina um valor mínimo desejado */
+    border-radius: 20px;
+    align-items: center;
+    color: white;
 }
+
+
 .lixeira{
     margin-left: auto;
     cursor: pointer;
-    width: 40px;
-    height: 40px;
+    width: 30px;
+    height: 40px ;
 }
 
 </style>
@@ -414,7 +417,7 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
 
-    function obterIdDoUsuario() {
+    function usuario() {
     // Recupera o cookie com o nome 'userId'
     const userIdCookie = document.cookie.split(';').find(cookie => cookie.trim().startsWith('userId='));
 
@@ -427,52 +430,55 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 }
 
-function excluirComentario(id) {
+async function excluirComentario(id) {
     if (!id) {
         console.error('ID do comentário inválido.');
         return;
     }
 
-    console.log(`.comentario[data-id="${id}"]`);
-    const comentarioElement = document.querySelector(`.comentario[data-id="${id}"]`);
-    console.log(comentarioElement);
+    try {
+        // Pedido para obter informações do comentário
+        const response = await fetch(`/info-comentario/${id}`);
+        const data = await response.json();
 
-    if (!comentarioElement) {
-        console.error('Elemento do comentário não encontrado.');
-        return;
-    }
+        const userId = usuario();
+        const comentarioUserId = data.userId;
 
-    // Verifica se o comentário pertence ao usuário logado
-    const userId = obterIdDoUsuario();
-    const comentarioUserId = comentarioElement.dataset.userid;
+        console.log('ID do usuário autenticado:', userId);
+        console.log('ID do usuário do comentário:', comentarioUserId);
 
-    if (userId === comentarioUserId) {
-        // Confirmação para excluir o comentário
-        const confirmacao = confirm('Tem certeza que deseja excluir este comentário?');
+        // Certifique-se de que você está comparando os IDs corretamente (como números ou strings)
+        if (userId == comentarioUserId) {
+    // Confirmação para excluir o comentário
+    const confirmacao = confirm('Tem certeza que deseja excluir este comentário?');
 
-        if (confirmacao) {
-            // Enviar uma solicitação DELETE para a rota de excluir-comentario
-            fetch(`/excluir-comentario/${id}`, {
-                method: 'DELETE',
+    if (confirmacao) {
+        // Enviar uma solicitação DELETE para a rota de excluir-comentario
+        fetch(`/excluir-comentario/${id}`, {
+            method: 'DELETE',
+        })
+            .then(response => response.json())
+            .then(data => {
+                console.log(data.message);
+
+                // Exibir um alerta indicando que o comentário foi excluído com sucesso
+                alert('Comentário excluído com sucesso!');
+
+                // Recarrega os comentários após a exclusão
+                carregarComentarios();
             })
-                .then(response => response.json())
-                .then(data => {
-                    console.log(data.message);
-
-                    // Exibir um alerta indicando que o comentário foi excluído com sucesso
-                    alert('Comentário excluído com sucesso!');
-
-                    // Recarrega os comentários após a exclusão
-                    carregarComentarios();
-                })
-                .catch(error => {
-                    console.error('Erro ao excluir o comentário:', error);
-                    // Implemente qualquer lógica adicional em caso de erro
-                });
+            .catch(error => {
+                console.error('Erro ao excluir o comentário:', error);
+                // Implemente qualquer lógica adicional em caso de erro
+            });
+    }
+} else {
+            // Se o comentário não pertence ao usuário logado, exibe uma mensagem ou faz outra ação necessária
+            alert('Você só pode excluir seus próprios comentários.');
         }
-    } else {
-        // Se o comentário não pertence ao usuário logado, exibe uma mensagem ou faz outra ação necessária
-        alert('Você só pode excluir seus próprios comentários.');
+    } catch (error) {
+        console.error('Erro ao obter informações do comentário:', error);
+        // Implemente qualquer lógica adicional em caso de erro
     }
 }
 

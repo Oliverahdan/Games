@@ -306,6 +306,25 @@ app.delete('/excluir-comentario/:commentId', async (req, res) => {
     }
 });
 
+// Rota para obter informações do comentário
+app.get('/info-comentario/:commentId', async (req, res) => {
+    const commentId = req.params.commentId;
+
+    try {
+        // Verificar se o comentário existe
+        const [comment] = await req.locals.connection.execute('SELECT user FROM comments WHERE id = ?', [commentId]);
+
+        if (comment.length === 0) {
+            res.status(404).json({ message: 'Comentário não encontrado' });
+        } else {
+            res.json({ userId: comment[0].user });
+        }
+    } catch (error) {
+        console.error('Erro ao obter informações do comentário:', error);
+        res.status(500).json({ message: 'Erro interno no servidor ao obter informações do comentário' });
+    }
+});
+
 
 // Restante do seu código
 app.post('/salvar-comentario', async (req, res) => {
@@ -374,6 +393,55 @@ app.get('/api/jogos', async (req, res) => {
         res.status(500).send('Erro interno do servidor');
     }
 });
+
+app.get('/api/jogos', async (req, res) => {
+    try {
+        const searchTerm = req.query.name ? req.query.name.toLowerCase() : null;
+        const category = req.query.category || null;
+
+        const connection = await createConnection();
+
+        // Log para verificar as consultas SQL geradas
+        console.log('Generated SQL for searchTerm:', searchTerm);
+        console.log('Generated SQL for category:', category);
+
+        // Se houver um termo de pesquisa, realizar uma consulta filtrada
+        if (searchTerm) {
+            let query = 'SELECT * FROM games WHERE LOWER(name) LIKE ?';
+            const params = [`%${searchTerm}%`];
+
+            // Adicione a condição da categoria se fornecida
+            if (category) {
+                query += ' AND FIND_IN_SET(?, categories) > 0';
+                params.push(category);
+            }
+
+            const [rows, fields] = await connection.execute(query, params);
+            console.log('Result for searchTerm:', rows);
+            res.json(rows);
+        } else {
+            // Caso contrário, obter todos os jogos ou jogos por categoria
+            let query = 'SELECT * FROM games';
+            const params = [];
+
+            // Adicione a condição da categoria se fornecida
+            if (category) {
+                query += ' WHERE FIND_IN_SET(?, categories) > 0';
+                params.push(category);
+            }
+
+            const [rows, fields] = await connection.execute(query, params);
+            console.log('Result for category:', rows);
+            res.json(rows);
+        }
+
+        await connection.end();
+    } catch (error) {
+        console.error('Erro ao buscar dados do banco de dados:', error);
+        res.status(500).send('Erro interno do servidor');
+    }
+});
+
 
 app.get('/cadastro', async (req, res) => {
     res.sendFile(path.join(__dirname, '/cadastro/index.html'));

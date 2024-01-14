@@ -8,9 +8,9 @@ const app = express();
 const port = 3000;
 
 const dbConfig = {
-    host: 'localhost',
+    host: 'monorail.proxy.rlwy.net',
     user: 'root',
-    password: 'danisilva0304',
+    password: '4g5e3gC34GfGdeHabge13EB3eFgceAFF',
     database: 'gamedan'
 };
 

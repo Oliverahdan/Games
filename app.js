@@ -233,6 +233,76 @@ app.get('/api/media-estrelas-geral', async (req, res) => {
     }
 });
 
+// Rota para atualizar dados do usuário
+app.put('/api/update/:id', async (req, res) => {
+    console.log('Recebida solicitação para atualizar dados do usuário');
+
+    const userId = req.params.id;
+    console.log('ID do usuário a ser atualizado:', userId);
+
+    // Verificar se o usuário está autenticado
+    const userCookie = req.cookies.userId;
+
+    if (!userCookie || userCookie !== userId) {
+        return res.status(401).json({ message: 'Usuário não autenticado' });
+    }
+
+    // Obter os dados que você deseja atualizar (name, email e password)
+    const updatedName = req.body.name;
+    const updatedEmail = req.body.email;
+    const updatedPassword = req.body.password;
+
+    // Validar se os dados necessários foram fornecidos
+    if (!updatedName && !updatedEmail && !updatedPassword) {
+        return res.status(400).json({ message: 'Pelo menos um dos campos (name, email, password) deve ser fornecido para atualização' });
+    }
+
+    try {
+        // Construir a consulta SQL para atualizar os dados do usuário
+        let updateQuery = 'UPDATE users SET';
+        const updateParams = [];
+
+        if (updatedName) {
+            updateQuery += ' name = ?,';
+            updateParams.push(updatedName);
+        }
+
+        if (updatedEmail) {
+            updateQuery += ' email = ?,';
+            updateParams.push(updatedEmail);
+        }
+
+        if (updatedPassword) {
+            updateQuery += ' password = ?,';
+            updateParams.push(updatedPassword);
+        }
+
+        // Remover a última vírgula da consulta SQL, se necessário
+        if (updateQuery.endsWith(',')) {
+            updateQuery = updateQuery.slice(0, -1);
+        }
+
+        updateQuery += ' WHERE id = ?';
+        updateParams.push(userId);
+
+        console.log('Consulta SQL gerada:', updateQuery, 'com os parâmetros:', updateParams);
+
+        // Executar a consulta SQL
+        const [updateResults] = await req.locals.connection.execute(updateQuery, updateParams);
+
+        if (updateResults.affectedRows === 0) {
+            return res.status(404).json({ message: 'Usuário não encontrado para atualização' });
+        }
+
+        // Retornar uma resposta de sucesso
+        res.json({ message: 'Dados do usuário atualizados com sucesso' });
+    } catch (error) {
+        console.error('Erro ao atualizar dados do usuário:', error);
+        res.status(500).json({ message: 'Erro interno no servidor ao atualizar dados do usuário' });
+    }
+});
+
+
 
 
 

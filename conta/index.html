@@ -163,6 +163,51 @@ font-family: "Kanit", sans-serif;
         background-color: #3B82F6;
         color: white;
     }
+
+    .userInfoItem {
+        border: 1px solid white; /* Adiciona uma borda branca */
+        border-radius: 5px; /* Borda arredondada */
+        margin: 5px 0; /* Adiciona margem acima e abaixo de cada item */
+        padding: 8px; /* Adiciona preenchimento interno */
+        position: relative; /* Permite posicionar elementos filhos */
+    }
+
+    .editIcon {
+        position: absolute;
+        right: 8px;
+        bottom: 50%;
+        transform: translateY(50%);
+        cursor: pointer;
+        width: 30px;
+        height: 30px;
+    }
+
+    .editable input {
+            border: 1px solid #3B82F6;
+            padding: 5px;
+            margin-right: 10px;
+            color: #3B82F6;
+        }
+    #userName{
+        font-size: 40px;
+    }
+    #logoutButton{
+        height: 50px;
+        width: 100px;
+        border-radius: 40px;
+        font-size: medium;
+        margin-top: 20px;
+    }
+
+    .eyeIcon {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            position: absolute;
+            right: 50px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
     </style>
     <title>Gamedan</title>
 </head>
@@ -194,21 +239,26 @@ font-family: "Kanit", sans-serif;
         </div>
       </header>
     
-    <section>  <!-- Se houver usuário logado, exibir as informações do usuário -->
-        <div class="contauser" style="height: 40px;">
-            <h1 style="color: white;" id="userName"></h1>
+   <!-- Se houver usuário logado, exibir as informações do usuário -->
+<section>
+    <div class="contauser" style="height: 40px;">
+        <h1 style="color: white;" id="userName"></h1>
+        <h3 style="font-size: 20px; color: white;">Informações do Usuário:</h3>
+        <div id="userInfo" style="color: white; font-size: 14px;"></div>
+        <div>            <!-- Adicionando botão de sair -->
+            <button id="logoutButton" onclick="logout()" >Sair</button>
         </div>
-    </section>
+    </div>
+</section>
 
+    
    <!-- Se não houver usuário logado, exibir o botão de login -->
     <div class="center-content" id="loginButtonContainer">
         <span style="color: white; margin-bottom: 20px; font-size: 30px;">Você não esta logado clique para entrar na sua conta</span>
         <button id="loginButton" onclick="window.location.href='/login'">Login</button>
         </div>
 
-        <div>            <!-- Adicionando botão de sair -->
-                    <button id="logoutButton" onclick="logout()">Sair</button>
-        </div>
+    
 
 </div>
 <footer class="footer">
@@ -217,6 +267,27 @@ font-family: "Kanit", sans-serif;
 </footer>
 </body>
 <script>
+
+let userData; // Defina a variável userData aqui para que seja global
+
+function togglePasswordVisibility(itemId) {
+    const item = document.getElementById(itemId);
+    const span = item.querySelector('span');
+    const eyeIcon = document.getElementById('eyeIcon');
+
+    // Verifique se userData está definido e se tem a propriedade 'password'
+    if (userData && userData.password) {
+        // Altera o tipo do campo de senha entre "password" e "text"
+        if (span.textContent.includes('*')) {
+            span.innerHTML = userData.password;
+            eyeIcon.src = 'https://i.postimg.cc/wxnqTfFM/olho-1.png';
+        } else {
+            span.innerHTML = '*'.repeat(userData.password.length);
+            eyeIcon.src = 'https://i.postimg.cc/tgtSPWRx/olho.png';
+        }
+    }
+}
+
     function voltar(){
             window.location.href = './jogos';
         }
@@ -243,17 +314,135 @@ font-family: "Kanit", sans-serif;
     });
 
     async function loadUserInfo(userId) {
-        try {
-            const response = await fetch(`/api/user/${userId}`);
-            const userData = await response.json();
+    try {
+        const response = await fetch(`/api/user/${userId}`);
+        const data = await response.json();
 
-            // Exibir o nome do usuário na seção "Conta"
-            const userNameElement = document.getElementById('userName');
-            userNameElement.textContent = userData.name;
-        } catch (error) {
-            console.error('Erro ao carregar informações do usuário:', error);
+        // Exibir o nome do usuário na seção "Conta"
+        const userNameElement = document.getElementById('userName');
+        userNameElement.textContent = data.name;
+
+        // Exibir os dados do usuário abaixo do nome
+        const userInfoElement = document.getElementById('userInfo');
+        userInfoElement.innerHTML = `
+            <div class="userInfoItem" id="nameItem">Nome: <span>${data.name}</span> <img src="https://i.postimg.cc/Qx4TytCW/editar.png" class="editIcon" onclick="makeEditable('nameItem')"></div>
+            <div class="userInfoItem" id="emailItem">Email: <span>${data.email}</span> <img src="https://i.postimg.cc/Qx4TytCW/editar.png" class="editIcon" onclick="makeEditable('emailItem')"></div>
+            <div class="userInfoItem" id="passwordItem">Senha: <span>${'*'.repeat(data.password.length)}</span> <img src="https://i.postimg.cc/tgtSPWRx/olho.png" class="eyeIcon" id="eyeIcon" onclick="togglePasswordVisibility('passwordItem')"><img src="https://i.postimg.cc/Qx4TytCW/editar.png" class="editIcon" onclick="makeEditable('passwordItem')"></div>
+        `;
+
+        // Defina userData globalmente para ser usada em outras funções
+        userData = data;
+    } catch (error) {
+        console.error('Erro ao carregar informações do usuário:', error);
+    }
+}
+
+
+function makeEditable(itemId) {
+    const item = document.getElementById(itemId);
+    const span = item.querySelector('span');
+
+    // Criar um elemento input e configurar seu valor inicial
+    const input = document.createElement('input');
+    input.value = span.textContent;
+
+    // Criar botões de edição e confirmação
+    const editButton = document.createElement('img');
+    editButton.src = 'https://i.postimg.cc/Qx4TytCW/editar.png';
+    editButton.classList.add('editIcon');
+    editButton.onclick = () => cancelEdit(item, span, input);
+
+    const confirmButton = document.createElement('img');
+    confirmButton.src = 'https://i.postimg.cc/FKXkdFZf/marca-de-verificacao.png';
+    confirmButton.classList.add('editIcon');
+    confirmButton.onclick = () => confirmEdit(item, span, input);
+
+    // Substituir o elemento span pelo input
+    item.innerHTML = '';
+    item.appendChild(input);
+    item.appendChild(editButton);
+    item.appendChild(confirmButton);
+}
+
+
+        function cancelEdit(item, span, input) {
+    // Cancelar a edição, restaurar o campo original
+    item.innerHTML = '';
+    item.appendChild(span);
+    const editButton = document.createElement('img');
+    editButton.src = 'https://i.postimg.cc/Qx4TytCW/editar.png';
+    editButton.classList.add('editIcon');
+    editButton.onclick = () => makeEditable(item.id);
+    item.appendChild(editButton);
+}
+
+function obterIdDoUsuario() {
+    const cookiesString = document.cookie;
+    const cookiesArray = cookiesString.split(';').map(cookie => cookie.trim());
+
+    for (const cookie of cookiesArray) {
+        const [cookieName, cookieValue] = cookie.split('=');
+
+        if (cookieName === 'userId') {  // Certifique-se de que este nome corresponde ao nome do cookie definido no login
+            return cookieValue;
         }
     }
+
+    return null;
+}
+
+function confirmEdit(item, span, input) {
+    // Confirmar a edição, enviar solicitação para o servidor
+    const newValue = input.value;
+
+    // Obter o ID do usuário do cookie
+    const userId = obterIdDoUsuario();
+
+    if (!userId) {
+        console.error('ID do usuário não encontrado. Usuário não autenticado.');
+        // Adicione a lógica apropriada para lidar com o usuário não autenticado
+        return;
+    }
+
+    // Obter o tipo de campo que está sendo editado
+    const fieldType = item.id.replace('Item', '').toLowerCase();
+
+    // Construir o objeto de atualização
+    const updateObject = {
+        id: userId,
+    };
+    updateObject[fieldType] = newValue;
+
+    // Aqui você deve enviar uma solicitação para o servidor para atualizar a informação no banco de dados
+    // Por exemplo, você pode usar fetch ou outra biblioteca para enviar uma solicitação PUT
+    // Substitua a URL e os detalhes da solicitação conforme necessário
+    fetch(`/api/update/${userId}`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(updateObject),
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`Erro ao enviar solicitação de atualização: ${response.statusText}`);
+        }
+        return response.json();
+    })
+    .then(data => {
+        // Se a atualização for bem-sucedida, atualize o conteúdo e restaure o campo original
+        span.textContent = newValue;
+        cancelEdit(item, span, input);
+    })
+    .catch(error => {
+        console.error('Erro ao enviar solicitação de atualização:', error);
+        // Em caso de erro, você pode tratar de acordo com seus requisitos
+    });
+}
+
+
+
+
 
     function getCookie(name) {
         const match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
@@ -269,6 +458,7 @@ font-family: "Kanit", sans-serif;
     function shop(){
         window.location.href = './shop';
     }
+
 </script>
 
     

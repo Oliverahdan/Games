@@ -207,6 +207,7 @@ font-family: "Kanit", sans-serif;
             right: 50px;
             top: 50%;
             transform: translateY(-50%);
+            display: none;
         }
     </style>
     <title>Gamedan</title>
@@ -270,48 +271,46 @@ font-family: "Kanit", sans-serif;
 
 let userData; // Defina a variável userData aqui para que seja global
 
-function togglePasswordVisibility(itemId) {
-    const item = document.getElementById(itemId);
-    const span = item.querySelector('span');
-    const eyeIcon = document.getElementById('eyeIcon');
 
-    // Verifique se userData está definido e se tem a propriedade 'password'
-    if (userData && userData.password) {
-        // Altera o tipo do campo de senha entre "password" e "text"
-        if (span.textContent.includes('*')) {
-            span.innerHTML = userData.password;
-            eyeIcon.src = 'https://i.postimg.cc/wxnqTfFM/olho-1.png';
-        } else {
-            span.innerHTML = '*'.repeat(userData.password.length);
-            eyeIcon.src = 'https://i.postimg.cc/tgtSPWRx/olho.png';
-        }
-    }
-}
+
+
+
 
     function voltar(){
             window.location.href = './jogos';
         }
-    document.addEventListener('DOMContentLoaded', () => {
-        const userId = getCookie('userId');
-        const loginButtonContainer = document.getElementById('loginButtonContainer');
-        const logoutButton = document.getElementById('logoutButton');
+        document.addEventListener('DOMContentLoaded', () => {
+    const userId = getCookie('userId');
+    const loginButtonContainer = document.getElementById('loginButtonContainer');
+    const logoutButton = document.getElementById('logoutButton');
 
-        if (userId) {
-            // Usuário logado, carregar informações do usuário
-            loadUserInfo(userId);
-            // Esconder o botão de login
-            loginButtonContainer.style.display = 'none';
-            // Mostrar o botão de logout
-            logoutButton.style.display = 'block';
-        } else {
-            // Se não houver usuário logado, exibir o botão de login
-            loginButtonContainer.style.display = 'flex';
-            // Esconder o botão de logout
-            logoutButton.style.display = 'none';
+    if (userId) {
+        // Usuário logado, carregar informações do usuário
+        loadUserInfo(userId);
+        // Esconder o botão de login
+        loginButtonContainer.style.display = 'none';
+        // Mostrar o botão de logout
+        logoutButton.style.display = 'block';
+    } else {
+        // Se não houver usuário logado, exibir o botão de login
+        loginButtonContainer.style.display = 'flex';
+        // Esconder o botão de logout
+        logoutButton.style.display = 'none';
+    }
 
-    
-        }
-    });
+    // Adicionar a lógica para ocultar os ícones do olho inicialmente
+    const eyeIcon1 = document.querySelector('.eyeIcon[src="https://i.postimg.cc/wxnqTfFM/olho-1.png"]');
+    const eyeIcon2 = document.querySelector('.eyeIcon[src="https://i.postimg.cc/tgtSPWRx/olho.png"]');
+
+    if (eyeIcon1) {
+        eyeIcon1.style.display = 'none';
+    }
+
+    if (eyeIcon2) {
+        eyeIcon2.style.display = 'none';
+    }
+});
+
 
     async function loadUserInfo(userId) {
     try {
@@ -337,6 +336,16 @@ function togglePasswordVisibility(itemId) {
     }
 }
 
+function togglePasswordVisibility(passwordItem) {
+    const eyeIcon1 = passwordItem.querySelector('.eyePasswordIcon[src="https://i.postimg.cc/wxnqTfFM/olho-1.png"]');
+    const eyeIcon2 = passwordItem.querySelector('.eyePasswordIcon[src="https://i.postimg.cc/tgtSPWRx/olho.png"]');
+
+    if (eyeIcon1 && eyeIcon2) {
+        eyeIcon1.style.display = eyeIcon1.style.display === 'none' ? 'block' : 'none';
+        eyeIcon2.style.display = eyeIcon2.style.display === 'none' ? 'block' : 'none';
+    }
+}
+
 
 function makeEditable(itemId) {
     const item = document.getElementById(itemId);
@@ -357,11 +366,38 @@ function makeEditable(itemId) {
     confirmButton.classList.add('editIcon');
     confirmButton.onclick = () => confirmEdit(item, span, input);
 
-    // Substituir o elemento span pelo input
+    // Adicionar o ícone do olho 1
+    const eyeIcon1 = document.createElement('img');
+    eyeIcon1.src = 'https://i.postimg.cc/wxnqTfFM/olho-1.png';
+    eyeIcon1.classList.add('eyeIcon');
+    eyeIcon1.onclick = () => togglePasswordVisibility(itemId);
+
+    // Ocultar o ícone do olho 1 inicialmente
+    eyeIcon1.style.display = 'none';
+
+    // Adicionar o ícone do olho 1 apenas se estiver editando a senha
+    if (itemId === 'passwordItem') {
+        item.appendChild(eyeIcon1);
+    }
+
+    // Adicionar o ícone do olho 2
+    const eyeIcon2 = document.createElement('img');
+    eyeIcon2.src = 'https://i.postimg.cc/tgtSPWRx/olho.png';
+    eyeIcon2.classList.add('eyeIcon');
+    eyeIcon2.onclick = () => togglePasswordVisibility(itemId);
+
+    // Ocultar o ícone do olho 2 inicialmente
+    eyeIcon2.style.display = 'none';
+
+    // Substituir o elemento span pelo input e adicionar os botões
     item.innerHTML = '';
     item.appendChild(input);
     item.appendChild(editButton);
     item.appendChild(confirmButton);
+
+    if (itemId === 'passwordItem') {
+        item.appendChild(eyeIcon2);
+    }
 }
 
 
@@ -433,13 +469,15 @@ function confirmEdit(item, span, input) {
         // Se a atualização for bem-sucedida, atualize o conteúdo e restaure o campo original
         span.textContent = newValue;
         cancelEdit(item, span, input);
+        
+        // Recarregar a página após a confirmação da edição
+        window.location.reload();
     })
     .catch(error => {
         console.error('Erro ao enviar solicitação de atualização:', error);
         // Em caso de erro, você pode tratar de acordo com seus requisitos
     });
 }
-
 
 
 

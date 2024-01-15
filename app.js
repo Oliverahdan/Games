@@ -3,6 +3,7 @@ const path = require('path');
 const mysql = require('mysql2/promise');
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
+const nodemailer = require('nodemailer');
 
 const app = express();
 const port = 3000;
@@ -31,6 +32,56 @@ app.use(async (req, res, next) => {
     // Criar uma nova conexão e armazená-la em req.locals.connection
     req.locals.connection = await createConnection();
     next();
+});
+
+app.post('/esqueceu-senha', async (req, res) => {
+    const { email } = req.body;
+
+    try {
+        const connection = await createConnection();
+
+        // Consulta SQL para obter a senha do usuário com base no email
+        const [results] = await connection.execute('SELECT password FROM users WHERE email = ?', [email]);
+
+        if (results.length > 0) {
+            const senha = results[0].password;
+
+            // Configurações do transporte de e-mail
+            const transporter = nodemailer.createTransport({
+                service: 'gmail',
+                auth: {
+                    user: 'dos03042003@gmail.com', // Substitua pelo seu e-mail
+                    pass: 'vpow fvyt ixjg crvq',
+                }
+            });
+
+            // Configurações do e-mail
+            const mailOptions = {
+                from: 'dos03042003@gmail.com', // Substitua pelo seu e-mail
+                to: email,
+                subject: 'Redefinição de Senha - Gamedan',
+                text: `Sua senha é: ${senha}`
+            };
+
+            // Enviar o e-mail
+            transporter.sendMail(mailOptions, (error, info) => {
+                if (error) {
+                    console.error('Erro ao enviar e-mail:', error);
+                    res.status(500).json({ message: 'Erro interno do servidor ao enviar o e-mail.' });
+                } else {
+                    console.log('E-mail enviado:', info.response);
+                    res.status(200).json({ message: 'E-mail enviado com sucesso.' });
+                }
+            });
+        } else {
+            res.status(400).json({ message: 'E-mail não encontrado.' });
+        }
+
+        await connection.end();
+    } catch (error) {
+        console.error('Erro no servidor:', error);
+        res.status(500).json({ message: 'Erro interno do servidor.' });
+    }
 });
 
 app.get('/descricao', async (req, res) => {

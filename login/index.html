@@ -44,6 +44,9 @@
 
             <button type="button" onclick="login()" class="mt-4 bg-blue-500 text-white px-4 py-2 rounded">Entrar</button>
             <button type="button" onclick="cadastro()" class="mt-4 bg-blue-500 text-white px-4 py-2 rounded">Cadastro</button>
+            <div class="mt-2">
+                <a href="#" onclick="esqueceuSenha()">Esqueceu a senha?</a>
+            </div>
         </form>
     </div>
 
@@ -106,6 +109,51 @@
         }
     }
 }
+
+function esqueceuSenha() {
+    const emailInput = document.getElementById('email');
+
+    // Validar se o campo de e-mail está preenchido
+    if (!emailInput.value.trim()) {
+        document.getElementById('emailError').textContent = 'Campo obrigatório';
+        return;
+    }
+
+    // Limpar mensagens de erro
+    document.getElementById('emailError').textContent = '';
+    document.getElementById('senhaError').textContent = '';
+    document.getElementById('loginError').textContent = '';
+
+    // Enviar solicitação para redefinir a senha
+    solicitarRedefinicaoSenha(emailInput.value.trim());
+}
+
+
+async function solicitarRedefinicaoSenha(email) {
+    try {
+        const response = await fetch('/esqueceu-senha', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                email: email
+            })
+        });
+
+        if (response.ok) {
+            alert('Um e-mail com as instruções para redefinir sua senha foi enviado.');
+        } else {
+            const data = await response.json();
+            console.error('Erro no servidor:', data.message);
+            alert('Erro ao solicitar redefinição de senha. Verifique o e-mail fornecido.');
+        }
+    } catch (error) {
+        console.error('Erro de rede:', error);
+        alert('Erro de rede ao solicitar redefinição de senha.');
+    }
+}
+
 
     </script>
 </body>

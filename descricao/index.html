@@ -635,8 +635,14 @@ function obterIdDoJogo() {
 
     // Verifica se o elemento spanMediaEstrelas existe antes de tentar manipulá-lo
     if (spanMediaEstrelas) {
-        // Atualiza o conteúdo do elemento com a média de estrelas
-        spanMediaEstrelas.innerText = `Média de Estrelas: ${mediaEstrelas.toFixed(2)}`;
+        // Verifica se a média de estrelas é válida antes de atualizar o conteúdo do elemento
+        if (mediaEstrelas !== undefined && mediaEstrelas !== null) {
+            // Atualiza o conteúdo do elemento com a média de estrelas
+            spanMediaEstrelas.innerText = `Média de Estrelas: ${mediaEstrelas.toFixed(2)}`;
+        } else {
+            // Se a média de estrelas não for válida, exibe uma mensagem indicando isso
+            spanMediaEstrelas.innerText = 'Média de Estrelas não disponível';
+        }
     } else {
         console.error('Elemento de exibição da média de estrelas não encontrado');
     }

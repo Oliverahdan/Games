@@ -209,6 +209,56 @@ font-family: "Kanit", sans-serif;
             transform: translateY(-50%);
             display: none;
         }
+
+
+        /*responsividade*/
+@media screen and (max-width: 500px) {
+.body {
+  margin-right: 2%;
+  margin-left: 2%;
+
+}
+.slides {
+height: 100px;
+}
+
+.categorias {
+font-size: 10px;
+}
+
+.rectangles-container {
+display: block;
+}
+
+.left-section, .right-section {
+font-size: 10px;
+}
+.shop{
+font-size: 10px;
+}
+.conta{
+font-size: 10px;
+}
+h1{
+display: none;
+}
+div.icon {
+margin-right: 5px;
+}
+img.icon{
+height: 30px;
+width: 30px;
+}
+.jogos{
+grid-template-columns: 1fr 1fr;
+}
+
+.imgjogo{
+height: 100px; /* Isso garante que a altura seja ajustada automaticamente, mantendo a proporção da imagem */
+
+}
+
+}
     </style>
     <title>Gamedan</title>
 </head>
@@ -244,7 +294,7 @@ font-family: "Kanit", sans-serif;
 <section>
     <div class="contauser" style="height: 40px;">
         <h1 style="color: white;" id="userName"></h1>
-        <h3 style="font-size: 20px; color: white;">Informações do Usuário:</h3>
+        <h3 id="userInfoSection" style="font-size: 20px; color: white;">Informações do Usuário:</h3>
         <div id="userInfo" style="color: white; font-size: 14px;"></div>
         <div>            <!-- Adicionando botão de sair -->
             <button id="logoutButton" onclick="logout()" >Sair</button>
@@ -283,6 +333,7 @@ let userData; // Defina a variável userData aqui para que seja global
     const userId = getCookie('userId');
     const loginButtonContainer = document.getElementById('loginButtonContainer');
     const logoutButton = document.getElementById('logoutButton');
+    const userInfoSection = document.getElementById('userInfoSection');
 
     if (userId) {
         // Usuário logado, carregar informações do usuário
@@ -291,11 +342,15 @@ let userData; // Defina a variável userData aqui para que seja global
         loginButtonContainer.style.display = 'none';
         // Mostrar o botão de logout
         logoutButton.style.display = 'block';
+        // Mostrar a seção de informações do usuário
+        userInfoSection.style.display = 'block';
     } else {
         // Se não houver usuário logado, exibir o botão de login
         loginButtonContainer.style.display = 'flex';
         // Esconder o botão de logout
         logoutButton.style.display = 'none';
+        // Ocultar a seção de informações do usuário
+        userInfoSection.style.display = 'none';
     }
 
     // Adicionar a lógica para ocultar os ícones do olho inicialmente

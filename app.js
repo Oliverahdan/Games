@@ -225,7 +225,8 @@ app.get('/api/media-estrelas-geral', async (req, res) => {
 
             res.json({ media: mediaGeral });
         } else {
-            res.status(404).json({ error: 'Avaliações não encontradas' });
+            // Se não houver avaliações, retornar uma média de 0
+            res.json({ media: 0 });
         }
     } catch (error) {
         console.error('Erro ao obter avaliações do banco de dados:', error);
@@ -500,18 +501,6 @@ app.post('/api/userhost', async (req, res) => {
 
 app.get('/api/jogos', async (req, res) => {
     try {
-        const connection = await mysql.createConnection(dbConfig);
-        const [rows, fields] = await connection.execute('SELECT * FROM games');
-        await connection.end();
-        res.json(rows);
-    } catch (error) {
-        console.error('Erro ao buscar dados do banco de dados:', error);
-        res.status(500).send('Erro interno do servidor');
-    }
-});
-
-app.get('/api/jogos', async (req, res) => {
-    try {
         const searchTerm = req.query.name ? req.query.name.toLowerCase() : null;
         const category = req.query.category || null;
 
@@ -552,6 +541,18 @@ app.get('/api/jogos', async (req, res) => {
         }
 
         await connection.end();
+    } catch (error) {
+        console.error('Erro ao buscar dados do banco de dados:', error);
+        res.status(500).send('Erro interno do servidor');
+    }
+});
+
+app.get('/api/jogos', async (req, res) => {
+    try {
+        const connection = await mysql.createConnection(dbConfig);
+        const [rows, fields] = await connection.execute('SELECT * FROM games');
+        await connection.end();
+        res.json(rows);
     } catch (error) {
         console.error('Erro ao buscar dados do banco de dados:', error);
         res.status(500).send('Erro interno do servidor');
